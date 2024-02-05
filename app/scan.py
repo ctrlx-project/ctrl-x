@@ -1,6 +1,7 @@
 import ipaddress
 import nmap
 import concurrent.futures
+import socket
 from sys import argv
 
 from app import create_app
@@ -39,6 +40,9 @@ def scan_subnet(subnet):
             result = future.result()
             save_to_db(result[0], result[1])
 
+def scan_domain(domain):
+    address = socket.gethostbyname(domain)
+    scan_subnet(address)
 
 if __name__ == "__main__":
     if len(argv) < 2:
