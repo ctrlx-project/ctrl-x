@@ -1,0 +1,6 @@
+openai~=1.10.0
+python-nmap~=0.7.1
+flask~=2.2.3
+flask_sqlalchemy~=3.0.3
+Flask~=2.2.3
+psycopg2-binary
