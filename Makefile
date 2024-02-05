@@ -1,7 +1,7 @@
 help:
 	@echo '### Available make targets:'
 	@grep PHONY: Makefile | cut -d: -f2 | sed '1d;s/^/make/'
-
+.PHONY: install
 install:
 	$(MAKE) -C store pull
 	$(MAKE) -C app venv
