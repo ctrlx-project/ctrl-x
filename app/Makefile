@@ -42,4 +42,4 @@ requirements: venv
 .PHONY: clean
 clean:
 	@echo "### Deleting app virtual environment"
-	rm -rf $$(find -name __pycache__) venv
+	sudo -E rm -rf $$(find -name __pycache__) venv
