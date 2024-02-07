@@ -17,6 +17,7 @@ def safe_get(obj, field):
         result = obj.get(field)
         if result is None:
             print("Failed scan")
+            # print(field)
     except:
         result = None
     return result
@@ -31,13 +32,14 @@ def parse_scan(dict):
         print("Failed scan")
         return None
     for network in scan.keys():
-        network_result = safe_get(dict, network)
+        network_result = safe_get(scan, network)
         state = safe_get(safe_get(network_result, "status"), "state")
         if state is None:
             return None
         result["network"] = {"state", state}
         if (state != "up"):
-            break
+            return None
+        fields = ["tcp", "udp"]
         
     return result
 
@@ -51,5 +53,4 @@ if __name__ == "__main__":
         exit(1)
     dict = loadJSON(argv[1])
     result = parse_scan(dict)
-    if not result:
-        exit(1)
+    print(result)
