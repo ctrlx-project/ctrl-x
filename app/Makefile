@@ -4,6 +4,14 @@ help:
 	@echo '### Available make targets:'
 	@grep PHONY: Makefile | cut -d: -f2 | sed '1d;s/^/make/'
 
+.PHONY: fix
+fix:
+	@echo "### Adding sudo to docker"
+	sudo systemctl enable docker
+	sudo systemctl start docker
+	sudo groupadd docker
+	sudo usermod -aG docker $USER
+	newgrp docker
 
 .PHONY: venv
 venv:
@@ -34,4 +42,4 @@ requirements: venv
 .PHONY: clean
 clean:
 	@echo "### Deleting app virtual environment"
-	rm -rf $$(find -name __pycache__) venv
+	sudo -E rm -rf $$(find -name __pycache__) venv
