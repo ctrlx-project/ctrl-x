@@ -1,10 +1,12 @@
 import ipaddress
 import nmap
 import concurrent.futures
-from sys import argv
+from sys import argv, stderr
 
 from app import create_app
 from models import db, Scans
+
+from utils import pretty_print
 
 app = create_app()
 
@@ -41,7 +43,8 @@ def scan_subnet(subnet):
 
 
 if __name__ == "__main__":
-    if len(argv) < 2:
-        print("Usage: py scan.py <subnet>; e.g. py scan.py 10.1.0.0/24")
+    if len(argv) == 1:
+        pretty_print("### Usage: make scan <subnet>; e.g. make scan.py 10.1.0.0/24", file=stderr)
+        exit(1)
     print("Scanning", argv[1])
     scan_subnet(argv[1])
