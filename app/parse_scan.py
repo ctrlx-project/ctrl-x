@@ -13,22 +13,28 @@ def loadJSON(filepath):
 
 
 def safe_get(obj, field):
-    result = obj.get(field)
-    if not result:
-        print("Invalid scan result")
-        exit(1)
+    try:
+        result = obj.get(field)
+        if result is None:
+            print("Failed scan")
+    except:
+        result = None
     return result
 
 
 def parse_scan(dict):
-    scan = safe_get(dict, "scan")
     result = {}
+    scan = safe_get(dict, "scan")
+    if scan is None:
+        return None
     if (len(scan.keys())!=1):
-        print("Invalid scan result")
-        exit(1)
+        print("Failed scan")
+        return None
     for network in scan.keys():
         network_result = safe_get(dict, network)
         state = safe_get(safe_get(network_result, "status"), "state")
+        if state is None:
+            return None
         result["network"] = {"state", state}
         if (state != "up"):
             break
