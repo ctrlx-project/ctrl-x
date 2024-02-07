@@ -18,7 +18,7 @@ venv:
 .PHONY: scan
 scan:
 	@echo "### Scanning.."
-	./venv/bin/python3 scan.py $(filter-out $@, $(MAKECMDGOALS))
+	sudo ./venv/bin/python3 scan.py $(filter-out $@, $(MAKECMDGOALS))
 %:
 	@true
 
