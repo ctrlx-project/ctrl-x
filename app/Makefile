@@ -23,14 +23,17 @@ venv:
 		# ./venv/bin/activate; \
 	fi
 
+db:
+	$(MAKE) -C store start
+
 .PHONY: scan
-scan:
+scan: db
 	sudo -E ./venv/bin/python3 scan.py $(filter-out $@, $(MAKECMDGOALS))
 %:
 	@true
 
 .PHONY: seed
-seed: venv
+seed: venv db
 	@echo "### Seeding database"
 	./venv/bin/python3 seeder.py
 

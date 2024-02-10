@@ -12,7 +12,7 @@ app = create_app()
 
 def nm_scan(ip):
     nm = nmap.PortScanner()
-    nm.scan(ip, arguments="-Pn -sS -sV -T5 --script=default,discovery,vuln")
+    nm.scan(ip, arguments="-Pn -sS -sV -A -T5 --script=default,discovery,vuln")
     scan_data = nm.analyse_nmap_xml_scan()
     return scan_data, ip
 

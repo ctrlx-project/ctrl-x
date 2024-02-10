@@ -8,7 +8,7 @@ pull:
 	sudo -E docker pull postgres:latest
 
 .PHONY: start
-run:
+start: pull
 	@echo "### Starting DB services"
 	sudo -E docker compose -f db.yml up -d
 
@@ -18,6 +18,6 @@ stop:
 	sudo -E docker compose -f db.yml stop
 
 .PHONY: delete
-reset:
+delete:
 	@echo "### Deleting DB"
 	sudo -E docker compose -f db.yml down -v
