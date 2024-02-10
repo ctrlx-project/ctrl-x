@@ -44,7 +44,7 @@ def scan_subnet(subnet):
 
 if __name__ == "__main__":
     if len(argv) == 1:
-        pretty_print("### Usage: make scan <subnet>; e.g. make scan 10.1.0.0/24", file=stderr)
+        pretty_print("--- Usage: make scan <subnet>; e.g. make scan 10.1.0.0/24", file=stderr)
         exit(1)
-    print("Scanning", argv[1])
+    pretty_print(f"Scanning {argv[1]}")
     scan_subnet(argv[1])
