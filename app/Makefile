@@ -23,22 +23,19 @@ venv:
 		# ./venv/bin/activate; \
 	fi
 
-db:
-	$(MAKE) -C store start
-
 .PHONY: scan
-scan: db
+scan:
 	sudo -E ./venv/bin/python3 scan.py $(filter-out $@, $(MAKECMDGOALS))
 %:
 	@true
 
 .PHONY: seed
-seed: venv db
+seed: venv
 	@echo "### Seeding database"
 	./venv/bin/python3 seeder.py
 
 .PHONY: req
-requirements: venv
+req: venv
 	@echo "### Updating app requirements"
 	pip-compile --quiet --upgrade requirements.txt
 

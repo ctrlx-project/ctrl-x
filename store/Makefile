@@ -5,7 +5,7 @@ help:
 .PHONY: pull
 pull:
 	@echo "### Pulling DB image"
-	sudo -E docker pull postgres:latest
+	sudo -E docker pull postgres:14-alpine
 
 .PHONY: start
 start: pull
