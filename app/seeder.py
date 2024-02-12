@@ -9,8 +9,7 @@ from pathlib import Path
 
 import os
 
-cwd = os.getcwd()
-directory = cwd + "/seed"
+directory = "./seed"
     
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
