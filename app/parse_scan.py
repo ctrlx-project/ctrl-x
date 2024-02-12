@@ -22,10 +22,27 @@ def safe_get(obj, field):
     return result
 
 
+def get_CVE(string):
+    # Parse a string and return a set of CVEs
+    index = string.find("CVE")
+    result = set()
+    while index != -1:
+        finalIndex = -1
+        for i in range(index, len(string)):
+            if string[i] == "\n" or string[i] == "\t":
+                finalIndex = i
+                break
+        result.add(string[index:finalIndex])
+        string = string[finalIndex:]
+        index = string.find("CVE") 
+    return result
+
+
 def parse_scan(dict):
-    """ Parse a single scan JSON and extract useful informations.
-    The return result should contain the state of the host, transport layer protocols that find open ports, 
-    and information regarding open ports. """
+    """ Parse a single scan dictionary and extract useful informations.
+    The return result should be a dictionary contain the state of the host, 
+    transport layer protocols that find open ports, 
+    information regarding open ports, and vulnerability """
     result = {}
     scan = safe_get(dict, "scan")
     if scan is None:
@@ -61,14 +78,11 @@ def parse_scan(dict):
                         name = safe_get(port_result, "name")
                         if name is not None:
                             result[network][field][port]["name"] = name
-                
-        
-        
+                        vulner = safe_get(safe_get(port_result, "script"), "vulners")
+                        if vulner is not None and type(vulner) == str:
+                            result[network][field][port]["vulner"] = get_CVE(vulner)     
     return result
 
-
-
-    return True
 
 if __name__ == "__main__":
     if len(argv) < 2:
