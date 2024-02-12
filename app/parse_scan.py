@@ -42,7 +42,22 @@ def parse_scan(dict):
     """ Parse a single scan dictionary and extract useful informations.
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
-    information regarding open ports, and vulnerability """
+    information regarding open ports, and vulnerability 
+    If the host is not up, None is returned."""
+
+    """
+    The structure of the output dictionary is:
+    {ip:{
+        "state": "up"/"down", 
+        "ports": {
+            port_number : {
+                "transport_protocol": transport protocol used to connect to the port
+                "name": portName,
+                "vulner": set(CVE_numbers)
+            }
+        } 
+    }}
+    """
     result = {}
     scan = safe_get(dict, "scan")
     if scan is None:
@@ -62,25 +77,24 @@ def parse_scan(dict):
             print("Failed scan")
             return None
         fields = ["tcp", "udp"]
-        result[network]["transport_protocol"] = []
         network_keys = network_result.keys()
+        result[network]["ports"] = {}
         for field in fields:
             if field in network_keys:
                 current = safe_get(network_result, field)
-                ports = current.keys()
-                if len(ports) > 0:
-                    result[network]["transport_protocol"].append(field)
-                    result[network][field] = {}
+                ports = []
+                if current is not None:
+                    ports = current.keys()
                 for port in ports:
                     port_result = safe_get(current, port)
                     if safe_get(port_result, "state") == "open":
-                        result[network][field][port] = {}
+                        result[network]["ports"][port] = {"transport_protocol": field}
                         name = safe_get(port_result, "name")
                         if name is not None:
-                            result[network][field][port]["name"] = name
+                            result[network]["ports"][port]["name"] = name
                         vulner = safe_get(safe_get(port_result, "script"), "vulners")
                         if vulner is not None and type(vulner) == str:
-                            result[network][field][port]["vulner"] = get_CVE(vulner)     
+                            result[network]["ports"][port]["vulner"] = get_CVE(vulner)     
     return result
 
 
