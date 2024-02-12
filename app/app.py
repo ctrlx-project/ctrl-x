@@ -22,3 +22,9 @@ def create_app() -> Flask:
     db.init_app(app)
 
     return app
+
+app = create_app()
+
+@app.route("/")
+def hello_world():
+    return "<p> Hello! <p>"
