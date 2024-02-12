@@ -43,7 +43,7 @@ def parse_scan(dict):
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
     information regarding open ports, and vulnerability 
-    If the host is not up, None is returned."""
+    If the host is not up, Empty dictionary is returned."""
 
     """
     The structure of the output dictionary is:
@@ -61,21 +61,17 @@ def parse_scan(dict):
     result = {}
     scan = safe_get(dict, "scan")
     if scan is None:
-        print("Failed scan")
-        return None
+        return {}
     if (len(scan.keys())!=1):
-        print("Failed scan")
-        return None
+        return {}
     for network in scan.keys():
         network_result = safe_get(scan, network)
         state = safe_get(safe_get(network_result, "status"), "state")
         if state is None:
-            print("Failed scan")
-            return None
+            return {}
         result[network] = {"state": state}
         if (state != "up"):
-            print("Failed scan")
-            return None
+            return {}
         fields = ["tcp", "udp"]
         network_keys = network_result.keys()
         result[network]["ports"] = {}
