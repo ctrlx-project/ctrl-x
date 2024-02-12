@@ -20,6 +20,7 @@ for file in os.listdir(directory):
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
     scans.append(Scans(scan_data=data, ip=ip))
+    f.close()
 
 with app.app_context():
         db.create_all()
