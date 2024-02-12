@@ -9,21 +9,21 @@ from pathlib import Path
 
 import os
 
-directory = "./seed"
-    
+directory = "./seed/nmap"
+
+count = 0
+scans = []
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
-    if filename.endswith(".json"): 
-        # print(os.path.join(directory, filename))
-        f = open(os.path.join(directory, filename))
-        data = json.load(f)
-        ip = Path(os.path.join(directory, filename)).stem
-        print(os.path.join(directory, filename))
-        with app.app_context():
-            db.create_all()
-            db.session.add(Scans(scan_data=data, ip=ip))
-            db.session.commit()
-        continue
-    else:
-        continue
+    f = open(os.path.join(directory, filename))
+    data = json.load(f)
+    ip = Path(os.path.join(directory, filename)).stem
+    count += 1
+    scans.append(Scans(scan_data=data, ip=ip))
 
+with app.app_context():
+        db.create_all()
+        db.session.add_all(scans)
+        db.session.commit()
+
+print("Added " + str(count) + " files to database")
