@@ -26,7 +26,7 @@ parser.add_argument('-O', '--output_dir', help='Sets the output directory.')
 
 # End of temporary code
 
-DATETIME_FORMAT = '"%Y-%m-%d_%H:%M:%S"'
+DATETIME_FORMAT = '"%Y-%m-%d_%H-%M-%S"'
 
 def nm_scan(ip: str) -> tuple:
     """Scans the given IP address using Nmap.
