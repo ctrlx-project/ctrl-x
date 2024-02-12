@@ -19,7 +19,8 @@ scan: install
 	@true
 
 .PHONY: seed
-seed: store
+seed:
+	$(MAKE) -C store start
 	sleep 3
 	$(MAKE) -C app seed
 

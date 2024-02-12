@@ -21,8 +21,10 @@ for file in os.listdir(directory):
         ip = Path(os.path.join(directory, filename)).stem
         print(os.path.join(directory, filename))
         with app.app_context():
+            db.create_all()
             db.session.add(Scans(scan_data=data, ip=ip))
             db.session.commit()
         continue
     else:
         continue
+
