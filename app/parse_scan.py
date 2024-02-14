@@ -62,7 +62,7 @@ def parse_scan(dict):
     scan = safe_get(dict, "scan")
     if scan is None:
         return {}
-    if (len(scan.keys())!=1):
+    if (len(scan.keys()) < 1):
         return {}
     for network in scan.keys():
         network_result = safe_get(scan, network)
