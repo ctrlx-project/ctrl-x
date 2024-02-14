@@ -12,6 +12,10 @@ fix:
 	sudo groupadd docker
 	sudo usermod -aG docker $USER
 	newgrp docker
+	@echo "### Installing metasploit"
+	curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && \
+		chmod 755 msfinstall && \
+		./msfinstall	
 
 .PHONY: venv
 venv:
