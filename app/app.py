@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from os import environ
 
-from flask import Flask
+from flask import Flask, render_template, url_for, request, redirect
 from models import db
+import json
 
 
 @dataclass
@@ -25,6 +26,14 @@ def create_app() -> Flask:
 
 app = create_app()
 
-@app.route("/")
-def hello_world():
-    return "<p> Hello! <p>"
+@app.route("/json", methods=["GET"])
+def send_data():
+    fs = open('./seed/10.1.0.1.json','r')
+    json_dump = fs.read()
+    fs.close()
+    json_data = json.loads(json_dump)
+    return json_data
+
+@app.route("/",methods=["GET"])
+def homepage():
+    return render_template("front_page.html")
