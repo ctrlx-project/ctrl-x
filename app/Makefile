@@ -4,6 +4,14 @@ help:
 	@echo '### Available make targets:'
 	@grep PHONY: Makefile | cut -d: -f2 | sed '1d;s/^/make/'
 
+.PHONY: fix
+fix:
+	@echo "### Adding sudo to docker"
+	sudo systemctl enable docker
+	sudo systemctl start docker
+	sudo groupadd docker
+	sudo usermod -aG docker $USER
+	newgrp docker
 
 .PHONY: venv
 venv:
@@ -17,8 +25,7 @@ venv:
 
 .PHONY: scan
 scan:
-	@echo "### Scanning.."
-	sudo ./venv/bin/python3 scan.py $(filter-out $@, $(MAKECMDGOALS))
+	sudo -E ./venv/bin/python3 scan.py $(filter-out $@, $(MAKECMDGOALS))
 %:
 	@true
 
@@ -28,11 +35,11 @@ seed: venv
 	./venv/bin/python3 seeder.py
 
 .PHONY: req
-requirements: venv
+req: venv
 	@echo "### Updating app requirements"
 	pip-compile --quiet --upgrade requirements.txt
 
 .PHONY: clean
 clean:
 	@echo "### Deleting app virtual environment"
-	rm -rf $$(find -name __pycache__) venv
+	sudo -E rm -rf $$(find -name __pycache__) venv

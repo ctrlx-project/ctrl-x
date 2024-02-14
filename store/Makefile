@@ -5,19 +5,19 @@ help:
 .PHONY: pull
 pull:
 	@echo "### Pulling DB image"
-	docker pull postgres:latest
+	sudo -E docker pull postgres:14-alpine
 
 .PHONY: start
-run:
+start: pull
 	@echo "### Starting DB services"
-	docker compose -f db.yml up -d
+	sudo -E docker compose -f db.yml up -d
 
 .PHONY: stop
 stop:
 	@echo "### Stopping DB services"
-	docker compose -f db.yml stop
+	sudo -E docker compose -f db.yml stop
 
 .PHONY: delete
-reset:
+delete:
 	@echo "### Deleting DB"
-	docker compose -f db.yml down -v
+	sudo -E docker compose -f db.yml down -v
