@@ -97,6 +97,9 @@ def scan_subnet(subnet: str) -> dict:
     
     return results
 
+def scan_domain(domain):
+    address = socket.gethostbyname(domain)
+    scan_subnet(address)
 
 if __name__ == "__main__":
     args = parser.parse_args()
