@@ -35,7 +35,7 @@ def nm_scan(ip: str) -> tuple:
       ip (str): The IP address of the scan.
 
     Returns:
-        (tuple): The IP address and the reusult of its scan.
+        (tuple): The IP address and the result of its scan.
     """
     nm = nmap.PortScanner()
     nm.scan(ip, arguments='-Pn -sS -sV -A -T5 --script=default,discovery,vuln')
