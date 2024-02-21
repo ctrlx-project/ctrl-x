@@ -13,6 +13,12 @@ fix:
 	sudo usermod -aG docker $USER
 	newgrp docker
 
+
+.PHONY: dev
+dev: venv
+	@echo "### Starting app in development mode"
+	./venv/bin/python3 main.py
+
 .PHONY: venv
 venv:
 	@if [ ! -d venv ]; then \
@@ -22,6 +28,11 @@ venv:
 		./venv/bin/pip install -r dev-req.txt; \
 		# ./venv/bin/activate; \
 	fi
+
+.PHONY: scannerd
+scannerd: venv
+	@echo "### Starting scanner daemon"
+	sudo -E ./venv/bin/python3 scannerd.py
 
 .PHONY: scan
 scan:
