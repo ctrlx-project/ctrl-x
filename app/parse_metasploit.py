@@ -3,10 +3,27 @@ from parse_scan import parse_from_JSON
 from sys import argv
 
 
-myIP = "0.0.0.0"
+my_ip = "0.0.0.0"
+
+
+def fill_option(option_name:str, target_ip:str, target_port:int, my_ip: str)->str | int:
+    """Chose which passed value to return based on option_name"""
+    option_upper = option_name.upper()
+    if option_upper == "RHOSTS" or option_upper == "RHOST":
+        return target_ip
+    elif option_upper == "SRVHOST" or option_upper == "CHOST":
+        return my_ip
+    elif option_upper == "RPORT":
+        return target_port
+    else:
+        print("Option does not exist")
+        return None
+    
 
 
 def metasploit_hosts(parsed_scan:dict, manager:MsfRpcClient):
+    """Find useful modules from Metasploit manager based on CVE in parsed_scan 
+    and fill the missing required option using the information stored in parsed_scan"""
     for ip, value in parsed_scan.items():
         if value["state"] != "up":
             continue
@@ -21,16 +38,7 @@ def metasploit_hosts(parsed_scan:dict, manager:MsfRpcClient):
                             missing = exploit.missing_required
                             print("Missing at the start: ", exploit.missing_required)
                             for option in missing:
-                                option_upper = option.upper()
-                                if option_upper == "RHOSTS" or option_upper == "RHOST":
-                                    exploit[option] = ip
-                                elif option_upper == "SRVHOST" or option_upper == "CHOST":
-                                    exploit[option] = myIP
-                                elif option_upper == "RPORT":
-                                    exploit[option] = port
-                                else:
-                                    print("Option does not exist")
-                                
+                                exploit[option] = fill_option(option, ip, port, my_ip)
                             print("Missing at the end: ", exploit.missing_required)
 
 
