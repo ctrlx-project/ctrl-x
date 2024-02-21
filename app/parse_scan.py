@@ -1,5 +1,6 @@
 import json
 from sys import argv
+from typing import Any
 
 
 def loadJSON(filepath:str)->dict:
@@ -13,11 +14,11 @@ def loadJSON(filepath:str)->dict:
     return scanResult
 
 
-def safe_get(dictionary:dict, field:str):
+def safe_get(dictionary:dict, field:str) -> Any:
     # Try to get the field from dictionary without causing the program to crash
     try:
         result = dictionary.get(field)
-    except:
+    except AttributeError:
         result = None
     return result
 
