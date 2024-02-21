@@ -6,7 +6,7 @@ from sys import argv
 myIP = "0.0.0.0"
 
 
-def metasploit_hosts(parsed_scan, manager):
+def metasploit_hosts(parsed_scan:dict, manager:MsfRpcClient):
     for ip, value in parsed_scan.items():
         if value["state"] != "up":
             continue
@@ -19,6 +19,7 @@ def metasploit_hosts(parsed_scan, manager):
                         if module and module.get("fullname") and module.get("type"):
                             exploit = manager.modules.use(module.get("type"), module.get("fullname"))
                             missing = exploit.missing_required
+                            print("Missing at the start: ", exploit.missing_required)
                             for option in missing:
                                 option_upper = option.upper()
                                 if option_upper == "RHOSTS" or option_upper == "RHOST":
@@ -30,7 +31,7 @@ def metasploit_hosts(parsed_scan, manager):
                                 else:
                                     print("Option does not exist")
                                 
-                            # print("Missing at the end: ", exploit.missing_required)
+                            print("Missing at the end: ", exploit.missing_required)
 
 
 if __name__ == "__main__":
@@ -38,5 +39,5 @@ if __name__ == "__main__":
         print("Usage: py parse_metasploit.py <file>; e.g. py parse_metasploit.py seed/10.1.0.1.json")
         exit(1)
     result = parse_from_JSON(argv[1])
-    manager = MsfRpcClient('Bz1evBuV', port=55552)
+    manager = MsfRpcClient('Ko4jSliH', port=55552)
     metasploit_hosts(result, manager)
