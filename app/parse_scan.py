@@ -2,7 +2,7 @@ import json
 from sys import argv
 
 
-def loadJSON(filepath):
+def loadJSON(filepath:str)->dict:
     # Load JSON file into a dictionary
     try:
         f = open(filepath, "r")
@@ -13,16 +13,16 @@ def loadJSON(filepath):
     return scanResult
 
 
-def safe_get(obj, field):
-    # Try to get the field from obj without causing the program to crash
+def safe_get(dictionary:dict, field:str):
+    # Try to get the field from dictionary without causing the program to crash
     try:
-        result = obj.get(field)
+        result = dictionary.get(field)
     except:
         result = None
     return result
 
 
-def get_CVE(string):
+def get_CVE(string:str)->set:
     # Parse a string and return a set of CVEs
     index = string.find("CVE")
     result = set()
@@ -38,7 +38,7 @@ def get_CVE(string):
     return result
 
 
-def parse_scan(scanResult):
+def parse_scan(scanResult:dict)->dict:
     """ Parse a single scan dictionary and extract useful informations.
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
