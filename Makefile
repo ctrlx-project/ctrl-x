@@ -18,11 +18,28 @@ scan: install
 %:
 	@true
 
+.PHONY: scannerd
+scannerd: install
+	$(MAKE) -C store start
+	sleep 3
+	$(MAKE) -C app scannerd
+
 .PHONY: seed
 seed:
 	$(MAKE) -C store start
 	sleep 3
 	$(MAKE) -C app seed
+
+main_app:
+	$(MAKE) -C app dev
+
+scannerd:
+	$(MAKE) -C app scannerd
+
+.PHONY: dev
+dev:
+	$(MAKE) -C store start
+	$(MAKE) -j main_app scannerd
 
 .PHONY: stop
 stop:
@@ -35,5 +52,4 @@ clean: stop
 
 .PHONY: reset
 reset: clean
-
 	$(MAKE) -C store delete
