@@ -33,7 +33,8 @@ def metasploit_hosts(parsed_scan:dict, manager:MsfRpcClient):
                 for cve in cve_set:
                     module_list = manager.modules.search(cve)
                     for module in module_list:
-                        if module and module.get("fullname") and module.get("type"):
+                        if module and module.get("fullname") and module.get("type") == "exploit":
+                            # print(module)
                             exploit = manager.modules.use(module.get("type"), module.get("fullname"))
                             missing = exploit.missing_required
                             print("Missing at the start: ", exploit.missing_required)
