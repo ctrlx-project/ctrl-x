@@ -9,8 +9,8 @@ def loadJSON(filepath):
     except:
         print("File does not exist")
         exit(1)
-    dict = json.load(f)
-    return dict
+    scanResult = json.load(f)
+    return scanResult
 
 
 def safe_get(obj, field):
@@ -38,7 +38,7 @@ def get_CVE(string):
     return result
 
 
-def parse_scan(dict):
+def parse_scan(scanResult):
     """ Parse a single scan dictionary and extract useful informations.
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
@@ -59,7 +59,7 @@ def parse_scan(dict):
     }}
     """
     result = {}
-    scan = safe_get(dict, "scan")
+    scan = safe_get(scanResult, "scan")
     if scan is None:
         return {}
     if (len(scan.keys()) < 1):
@@ -98,6 +98,6 @@ if __name__ == "__main__":
     if len(argv) < 2:
         print("Usage: py parse_scan.py <file>; e.g. py scan.py seed/10.1.0.1.json")
         exit(1)
-    dict = loadJSON(argv[1])
-    result = parse_scan(dict)
+    scanResult = loadJSON(argv[1])
+    result = parse_scan(scanResult)
     print(result)
