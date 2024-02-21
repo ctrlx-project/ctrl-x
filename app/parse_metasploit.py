@@ -23,8 +23,13 @@ def metasploit_hosts(parsed_scan, manager):
                                 option_upper = option.upper()
                                 if option_upper == "RHOSTS" or option_upper == "RHOST":
                                     exploit[option] = ip
-                                elif option_upper == "SRVHOST":
+                                elif option_upper == "SRVHOST" or option_upper == "CHOST":
                                     exploit[option] = myIP
+                                elif option_upper == "RPORT":
+                                    exploit[option] = port
+                                else:
+                                    print("Option does not exist")
+                                
                             # print("Missing at the end: ", exploit.missing_required)
 
 
