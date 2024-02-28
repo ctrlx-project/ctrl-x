@@ -36,8 +36,9 @@ class Env:
     stop_event = threading.Event()
 
     def update(self):
-        self.nmap_scan_args = Setting.query.get('nmap_scan_args').first().value
-        self.resolver.nameservers = [Setting.query.get('nameserver').first().value, '8.8.8.8']
+        with app.app_context():
+            self.nmap_scan_args = Setting.query.get('nmap_scan_args').first().value
+            self.resolver.nameservers = [Setting.query.get('nameserver').first().value, '8.8.8.8']
 
     def __update(self):
         while not self.stop_event.is_set():
@@ -61,6 +62,8 @@ env = Env()
 def nm_scan(ip: str):
     nm = nmap.PortScanner()
     scan = Scan(ip=ipaddress.ip_network(ip, strict=False), status='running', start_time=datetime.now())
+    db.session.add(scan)
+    db.session.commit()
     nm.scan(ip, arguments=env.nmap_scan_args)
     scan_data = nm.analyse_nmap_xml_scan()
     scan.scan_data = scan_data
@@ -87,6 +90,7 @@ def scan_job(subnet_ip: str):
 
 
 if __name__ == "__main__":
+    sleep(3)
     app = create_app()
     env.start()
 
@@ -97,7 +101,7 @@ if __name__ == "__main__":
         if not ip:
             return error_resp('IP is required')
         threading.Thread(target=scan_job, args=(ip,)).start()
-        return success_resp(f"Scan job for {ip} dispatched at {db.func.now()}")
+        return success_resp(f"Scan job for {ip} dispatched at {datetime.now()}")
 
 
     app.run(port=8000, debug=True)

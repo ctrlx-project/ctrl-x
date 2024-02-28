@@ -11,7 +11,6 @@ class Scan(db.Model):
     scan_data = db.Column(db.JSON, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     end_time = db.Column(db.DateTime, nullable=False)
-    job = db.relationship('ScanJob', backref='scan')
     status = db.Column(db.String(15))
 
 
