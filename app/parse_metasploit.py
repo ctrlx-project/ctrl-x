@@ -4,7 +4,8 @@ from sys import argv
 
 my_ip = "0.0.0.0"    
 
-class MetasploitManager:
+
+class ExploitManager:
     def __init__(self, password: str, port: int):
         """Instantiates an object of the MetasploitManager class.""" 
         self.parsed_scan = None
@@ -34,7 +35,6 @@ class MetasploitManager:
                 cve_set = info.get("vulner", [])
                 for cve in cve_set:
                     self.get_module(ip, port, cve)
-
         return self.modules
 
     def get_module(self, ip: str, port: str, cve: str):
@@ -54,13 +54,11 @@ class MetasploitManager:
             if (module and
                 (module_name := module.get("fullname")) and
                 (module.get("type") == "exploit")):
-
                 self.modules[ip] = self.modules.get(ip, {})
                 self.modules[ip][port] = self.modules[ip].get(port, {})
                 self.modules[ip][port][cve] = self.modules[ip][port].get(cve, {})
-
-                exploit = self.manager.modules.use("exploit", module_name)
                 self.modules[ip][port][cve] = {"module_name": module_name}
+                exploit = self.manager.modules.use("exploit", module_name)
                 missing = exploit.missing_required
                 for option in exploit.options:
                     if option in missing:
@@ -109,7 +107,7 @@ if __name__ == "__main__":
         print("Usage: py parse_metasploit.py <file>; e.g. py parse_metasploit.py seed/10.1.0.1.json")
         exit(1)
     result = parse_from_JSON(argv[1])
-    manager = MetasploitManager('JW19ka73', 55552)
+    manager = ExploitManager('JW19ka73', 55552)
     manager.load_scan(result) 
     manager.analyze_targets()
     print(manager.options)
