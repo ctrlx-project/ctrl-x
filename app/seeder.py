@@ -1,13 +1,11 @@
-from app import create_app
-from models import db, Scans
-from flask_sqlalchemy import SQLAlchemy
-from scan import app
-import json
-
-from utils import pretty_print
+from models import db, Scan, Setting
 from pathlib import Path
-
+import json
 import os
+
+from app import create_app
+
+app = create_app()
 
 directory = "./seed/nmap"
 
@@ -19,12 +17,24 @@ for file in os.listdir(directory):
     data = json.load(f)
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(Scans(scan_data=data, ip=ip))
+    scans.append(Scan(scan_data=data, ip=ip))
     f.close()
 
 with app.app_context():
-        db.create_all()
-        db.session.add_all(scans)
-        db.session.commit()
+    db.create_all()
+    db.session.add_all(scans)
+    db.session.commit()
 
 print("Added " + str(count) + " files to database")
+
+with open('seed/settings.json', 'r') as file:
+    settings_sample_data = json.load(file)
+
+settings = []
+for pref in settings_sample_data:
+    setting = Setting(key=pref['key'], value=pref['value'])
+    settings.append(setting)
+
+with app.app_context():
+    db.session.add_all(settings)
+    db.session.commit()
