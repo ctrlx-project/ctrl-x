@@ -7,7 +7,6 @@ class Scan(db.Model):
     __tablename__ = 'scans'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(15), nullable=False)
-    subnet = db.Column(db.String(18))
     scan_data = db.Column(db.JSON, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     end_time = db.Column(db.DateTime, nullable=False)

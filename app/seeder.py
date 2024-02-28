@@ -1,5 +1,6 @@
 from models import db, Scan, Setting
 from pathlib import Path
+from datetime import datetime
 import json
 import os
 
@@ -17,10 +18,11 @@ for file in os.listdir(directory):
     data = json.load(f)
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(Scan(scan_data=data, ip=ip))
+    scans.append(Scan(scan_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
     f.close()
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
     db.session.add_all(scans)
     db.session.commit()
