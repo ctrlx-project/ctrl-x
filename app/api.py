@@ -1,5 +1,5 @@
 from flask import Blueprint
-from models import db, Scan, ScanJob
+from models import db, Scan
 from utils import success_resp, error_resp
 
 api = Blueprint('api', __name__, static_folder='static', template_folder='templates')

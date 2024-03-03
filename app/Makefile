@@ -9,36 +9,30 @@ fix:
 	@echo "### Adding sudo to docker"
 	sudo systemctl enable docker
 	sudo systemctl start docker
+	newgrp docker
 	sudo groupadd docker
 	sudo usermod -aG docker $USER
-	newgrp docker
-
-
-.PHONY: dev
-dev: venv
-	@echo "### Starting app in development mode"
-	./venv/bin/python3 main.py
+	sudo systemctl restart docker
 
 .PHONY: venv
 venv:
 	@if [ ! -d venv ]; then \
-  		echo "### Creating app virtual environment"; \
+  		echo "### Creating virtual environment"; \
 		$(PYTHON) -m venv venv; \
 		./venv/bin/python3 -m pip install --upgrade pip; \
 		./venv/bin/pip install -r dev-req.txt; \
 		# ./venv/bin/activate; \
 	fi
 
-.PHONY: scannerd
-scannerd: venv
-	@echo "### Starting scanner daemon"
-	sudo -E ./venv/bin/python3 scannerd.py
+.PHONY: app
+app:
+	@echo "### Starting app"
+	./venv/bin/python3 main.py
 
-.PHONY: scan
-scan:
-	sudo -E ./venv/bin/python3 scan.py $(filter-out $@, $(MAKECMDGOALS))
-%:
-	@true
+.PHONY: scannerd
+scannerd:
+	@echo "### Starting scannerd"
+	sudo -E ./venv/bin/python3 scannerd.py
 
 .PHONY: seed
 seed: venv
