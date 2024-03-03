@@ -11,13 +11,6 @@ install:
 	$(MAKE) -C store pull
 	$(MAKE) -C app venv
 
-.PHONY: scan
-scan: install
-	$(MAKE) -C store start
-	$(MAKE) -C app scan $(filter-out $@, $(MAKECMDGOALS))
-%:
-	@true
-
 .PHONY: scannerd
 scannerd: install
 	$(MAKE) -C store start
@@ -29,12 +22,6 @@ seed:
 	$(MAKE) -C store start
 	sleep 3
 	$(MAKE) -C app seed
-
-main_app:
-	$(MAKE) -C app dev
-
-scannerd:
-	$(MAKE) -C app scannerd
 
 .PHONY: dev
 dev:
