@@ -34,8 +34,8 @@ def get_CVE(string):
                 break
         result.add(string[index:finalIndex])
         string = string[finalIndex:]
-        index = string.find("CVE") 
-    return result
+        index = string.find("CVE")
+    return list(result)
 
 
 def parse_scan(dict):
@@ -101,3 +101,6 @@ if __name__ == "__main__":
     dict = loadJSON(argv[1])
     result = parse_scan(dict)
     print(result)
+    f = open("parsed/test.json", "w")
+    json.dump(result, f , indent=6)
+    
