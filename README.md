@@ -4,11 +4,11 @@ This project requires these dependencies:
 - docker
 - python 3.10
 
-To run the project, you can use the following commands. Run `make` to see the available targets. 
-Some of them are not implemented yet.
+Run `make` to see the available targets. 
+Main app is available at `http://localhost:5000` and the daemon at `http://localhost:8000` in dev mode.
 
 ```bash
-make scan <ip or subnet> # Scan the subnet or ip and adds the results to the db (requires root)
+make dev # Start the database, main app and the scanner daemon
 ``` 
 
 ```bash

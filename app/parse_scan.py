@@ -95,10 +95,14 @@ def parse_scan(scanResult:dict)->dict:
     return result
 
 
+def parse_from_JSON(file):
+    dict = loadJSON(file)
+    result = parse_scan(dict)
+    return result
+
 if __name__ == "__main__":
     if len(argv) < 2:
         print("Usage: py parse_scan.py <file>; e.g. py scan.py seed/10.1.0.1.json")
         exit(1)
-    scanResult = loadJSON(argv[1])
-    result = parse_scan(scanResult)
+    result = parse_from_JSON(argv[1])
     print(result)

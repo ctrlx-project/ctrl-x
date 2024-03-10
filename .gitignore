@@ -3,3 +3,4 @@ app/venv
 app/__pycache__
 .idea
 .vscode
+*.pyc
