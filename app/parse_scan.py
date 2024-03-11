@@ -13,16 +13,6 @@ def loadJSON(filepath:str)->dict:
     scanResult = json.load(f)
     return scanResult
 
-
-def safe_get(dictionary:dict, field:str) -> Any:
-    # Try to get the field from dictionary without causing the program to crash
-    try:
-        result = dictionary.get(field)
-    except AttributeError:
-        result = None
-    return result
-
-
 def get_CVE(string:str)->set:
     # Parse a string and return a set of CVEs
     index = string.find("CVE")
@@ -60,14 +50,14 @@ def parse_scan(scanResult:dict)->dict:
     }}
     """
     result = {}
-    scan = safe_get(scanResult, "scan")
+    scan = scanResult.get("scan")
     if scan is None:
         return {}
     if (len(scan.keys()) < 1):
         return {}
     for network in scan.keys():
-        network_result = safe_get(scan, network)
-        state = safe_get(safe_get(network_result, "status"), "state")
+        network_result = scan.get(network)
+        state = network_result.get("status",{}).get("state")
         if state is None:
             return {}
         result[network] = {"state": state}
@@ -78,19 +68,22 @@ def parse_scan(scanResult:dict)->dict:
         result[network]["ports"] = {}
         for field in fields:
             if field in network_keys:
-                current = safe_get(network_result, field)
+                current = network_result.get(field)
                 ports = []
                 if current is not None:
                     ports = current.keys()
                 for port in ports:
-                    port_result = safe_get(current, port)
-                    if safe_get(port_result, "state") == "open":
+                    port_result = current.get(port)
+                    if port_result.get("state") == "open":
                         result[network]["ports"][port] = {"transport_protocol": field}
-                        name = safe_get(port_result, "name")
-                        if name is not None:
+                        name = port_result.get("name")
+                        if name:
                             result[network]["ports"][port]["name"] = name
-                        vulner = safe_get(safe_get(port_result, "script"), "vulners")
-                        if vulner is not None and type(vulner) == str:
+                        service = f'{port_result.get("product", name)} {port_result.get("version")}'.strip()
+                        if service:
+                            result[network]["ports"][port]["service"] = service
+                        vulner = port_result.get("script",{}).get("vulners")
+                        if vulner and type(vulner) == str:
                             result[network]["ports"][port]["vulner"] = get_CVE(vulner)     
     return result
 
