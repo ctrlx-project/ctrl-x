@@ -3,6 +3,7 @@ from os import environ
 
 from flask import Flask
 from models import db
+from flask_migrate import Migrate
 
 
 @dataclass
@@ -20,5 +21,7 @@ def create_app() -> Flask:
     app.config["SQLALCHEMY_ECHO"] = False
 
     db.init_app(app)
+
+    migrate = Migrate(app, db)
 
     return app
