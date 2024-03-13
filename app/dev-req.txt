@@ -5,5 +5,5 @@ flask_sqlalchemy~=3.0.3
 Flask~=2.2.3
 psycopg2-binary
 dnspython
-python-dotenv
+Flask-Migrate~=4.0.5
 gunicorn
