@@ -1,0 +1,33 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ssh key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Checkout project
+        uses: actions/checkout@v2
+
+      - name: Prerequisites
+        run: |
+          if ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} '[ -d "ctrl-x" ]'; then
+            echo "";
+          else
+            echo "Project does not exist";
+            exit 1;
+          fi
+
+      - name: Deploy
+        run: |
+          ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} 'cd ctrl-x && docker compose down && git pull && docker compose up -d --build --force-recreate'
+        env:
+          SSH_USER: ${{secrets.SSH_USER}}
+          SSH_HOST: ${{secrets.SSH_HOST}}
