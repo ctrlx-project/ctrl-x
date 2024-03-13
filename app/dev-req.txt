@@ -6,3 +6,4 @@ Flask~=2.2.3
 psycopg2-binary
 dnspython
 Flask-Migrate~=4.0.5
+gunicorn

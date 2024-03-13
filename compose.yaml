@@ -1,0 +1,71 @@
+version: "3.8"
+services:
+  traefik:
+    image: traefik
+    restart: always
+    command:
+      - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--global.sendAnonymousUsage=false"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.tls.acme.httpchallenge=true"
+      - "--certificatesresolvers.tls.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.tls.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.tls.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "traefik:/letsencrypt"
+
+
+  postgres:
+    extends:
+      file: ./store/db.yaml
+      service: postgres
+    restart: always
+    environment:
+      - "POSTGRES_USER=${POSTGRES_USER}"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.app
+    restart: always
+    privileged: true
+    environment:
+      - "POSTGRES_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/ctrl-x"
+      - "SCANNERD_URL=http://scannerd:8000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.request.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.request.tls=true"
+      - "traefik.http.routers.request.tls.certresolver=tls"
+      - "traefik.http.services.request.loadbalancer.server.port=5000"
+    depends_on:
+      - postgres
+
+
+  scannerd:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.scannerd
+    restart: always
+    privileged: true
+    environment:
+      - "POSTGRES_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/ctrl-x"
+    expose:
+      - "8000"
+    depends_on:
+      - postgres
+
+volumes:
+  traefik:
+  ctrl_x:
