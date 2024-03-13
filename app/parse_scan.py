@@ -3,18 +3,31 @@ from sys import argv
 from typing import Any
 
 
-def loadJSON(filepath:str)->dict:
-    # Load JSON file into a dictionary
+def loadJSON(file_path: str) -> dict | list:
+    """Loads the file located at the given path.
+
+    Args:
+        (str): Path of the file to be loaded
+
+    Returns:
+        (dict | list): Object with contents of the loaded JSON file
+    """
     try:
-        f = open(filepath, "r")
-    except:
-        print("File does not exist")
+        with open(file_path, "r") as json_file: 
+            return json.load(json_file)
+    except FileNotFoundError:
+        print(f"File {file_path} does not exist")
         exit(1)
-    scanResult = json.load(f)
-    return scanResult
 
 def get_CVE(string:str)->set:
-    # Parse a string and return a set of CVEs
+    """Parses a given string and returns a list of all CVEs included on it.
+
+    Args:
+        (dict): Dictionary output from the Nmap scan
+
+    Returns:
+        (dict): Parsed scan with useful information for metasploit
+    """
     index = string.find("CVE")
     result = set()
     while index != -1:
@@ -34,20 +47,25 @@ def parse_scan(scanResult:dict)->dict:
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
     information regarding open ports, and vulnerability 
-    If the host is not up, Empty dictionary is returned."""
+    If the host is not up, Empty dictionary is returned.
 
-    """
-    The structure of the output dictionary is:
-    {ip:{
-        "state": "up"/"down", 
-        "ports": {
-            port_number : {
-                "transport_protocol": transport protocol used to connect to the port
-                "name": portName,
-                "vulner": set(CVE_numbers)
-            }
-        } 
-    }}
+    Args:
+        (dict): Dictionary output from the Nmap scan
+
+    Returns:
+        (dict): Parsed scan with useful information for metasploit
+        The structure of the output dictionary is:
+        {ip:{
+            "state": "up"/"down", 
+            "ports": {
+                port_number : {
+                    "transport_protocol": transport protocol used to connect to the port
+                    "name": portName,
+                    "service": service running on that port
+                    "vulner": set(CVE_numbers)
+                }
+            } 
+        }}
     """
     result = {}
     scan = scanResult.get("scan")
@@ -79,8 +97,10 @@ def parse_scan(scanResult:dict)->dict:
                         name = port_result.get("name")
                         if name:
                             result[network]["ports"][port]["name"] = name
-                        service = f'{port_result.get("product", name)} {port_result.get("version")}'.strip()
-                        if service:
+                        product = port_result.get("product").strip()
+                        version = port_result.get("version").strip()
+                        if product:
+                            service = f'{product} {version}'.strip()
                             result[network]["ports"][port]["service"] = service
                         vulner = port_result.get("script",{}).get("vulners")
                         if vulner and type(vulner) == str:
