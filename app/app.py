@@ -8,6 +8,7 @@ from models import db
 @dataclass
 class Env:
     postgres_url: str = environ.get("POSTGRES_URL", default="postgresql://admin:admin@localhost:5432/ctrl-x")
+    scannerd_url: str = environ.get("SCANNERD_URL", default="http://localhost:8000")
 
 
 env = Env()
