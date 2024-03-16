@@ -3,11 +3,13 @@ from os import environ
 
 from flask import Flask
 from models import db
+from flask_migrate import Migrate
 
 
 @dataclass
 class Env:
     postgres_url: str = environ.get("POSTGRES_URL", default="postgresql://admin:admin@localhost:5432/ctrl-x")
+    scannerd_url: str = environ.get("SCANNERD_URL", default="http://localhost:8000")
 
 
 env = Env()
@@ -20,5 +22,7 @@ def create_app() -> Flask:
     app.config["SQLALCHEMY_ECHO"] = False
 
     db.init_app(app)
+
+    migrate = Migrate(app, db)
 
     return app
