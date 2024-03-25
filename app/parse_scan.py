@@ -104,7 +104,7 @@ def parse_scan(scanResult:dict)->dict:
                             result[network]["ports"][port]["service"] = service
                         vulner = port_result.get("script",{}).get("vulners")
                         if vulner and type(vulner) == str:
-                            result[network]["ports"][port]["vulner"] = get_CVE(vulner)     
+                            result[network]["ports"][port]["vulner"] = list(get_CVE(vulner))     
     return result
 
 

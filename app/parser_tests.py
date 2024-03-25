@@ -5,7 +5,7 @@ I'm not sure exactly what tests will look like, but I'm starting writting the un
 import parse_scan
 import json, pprint
 
-SCAN_PATH = "seed/metasploitable/10.10.0.14_2024-02-10_19-51-24.json"
+SCAN_PATH = "seed/nmap/metasploitable_scan.json"
 
 with open(SCAN_PATH) as json_file:
     SCAN = json.load(json_file)
@@ -41,6 +41,9 @@ def test_parse_scan():
     result = parse_scan.parse_scan(SCAN)
     print(expected_result == result)
 
+pprint.pprint(parse_scan.parse_scan(SCAN))
+with open("seed/scan_parser/parsed_metasploitable.json", 'w') as fp:
+    json.dump(parse_scan.parse_scan(SCAN), fp)
 test_load_json()
 test_get_cve()
 test_parse_scan()
