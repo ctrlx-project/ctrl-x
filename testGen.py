@@ -11,10 +11,13 @@ accessToken = "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"
 
 cveList = ["CVE-2012-0814", "CVE-2008-1657", "CVE-2011-2168", "CVE-2011-4327","CVE-2008-5161","CVE-2010-4478","CVE-2011-5000","CVE-2008-3259","CVE-2010-5107","CVE-2011-1013", "CVE-2010-4754", "CVE-2010-4755"]
 
+# Can also get CVSS score
 def getDescription(cveList: list) -> str:
      descriptions = ""
+     CVSS = []
      for cve in cveList:
           r = requests.get(f"https://services.nvd.nist.gov/rest/json/cves/2.0?cveId={cve}")
+          time.sleep(5)
           try:
                r_dict = r.json()
           except:
@@ -22,16 +25,35 @@ def getDescription(cveList: list) -> str:
                continue
           vulnerabilities = r_dict.get("vulnerabilities")
           if vulnerabilities and len(vulnerabilities) == 1:
-               cve = vulnerabilities[0].get("cve")
-               if cve and cve.get("descriptions"):
-                    descriptionList = cve.get("descriptions")
-                    for description in descriptionList:
-                         if description.get("lang") == "en" and description.get("value") is not None:
-                              descriptions += description.get("value") + "\n" 
-     return descriptions
+               cveData = vulnerabilities[0].get("cve")
+               if cveData:
+                    withDescription = False
+                    if cveData.get("descriptions"):
+                         descriptionList = cveData.get("descriptions")
+                         for description in descriptionList:
+                              if description.get("lang") == "en" and description.get("value") is not None:
+                                   if len(descriptions) > 0:
+                                        descriptions += "\n"
+                                   descriptions += description.get("value") 
+                                   withDescription = True
+                    if cveData.get("metrics"):
+                         metric = cveData.get("metrics")
+                         if len(metric.keys()) > 0:
+                              cvssMetric = metric.get(list(metric.keys())[0])
+                              if len(cvssMetric) > 0:
+                                   cvssData = cvssMetric[0].get("cvssData")
+                                   if cvssData and cvssData.get("vectorString") and cvssData.get("baseScore"):
+                                        CVSS.append([cve, cvssData.get("baseScore"), cvssData.get("vectorString")])          
+                                        if withDescription:
+                                             descriptions += f" CVSS score is {cvssData.get('baseScore')}"
+     return descriptions, CVSS
 
-descriptions = getDescription(cveList)
+print("Length of CVE: ", len(cveList))
+descriptions, CVSS = getDescription(cveList)
+print(CVSS)
+print("Length of CVSS: ", len(CVSS))
 print(descriptions)
+exit()
 
 pretrained = "openchat/openchat_3.5"
 # pretrained = "google/gemma-2b-it"
@@ -56,6 +78,7 @@ end = time.time()
 print("Input tokenized: ", end -start)
 
 start = time.time()
+print("Start model generation")
 outputs = model.generate(input_ids, max_new_tokens=1000)
 end = time.time()
 
