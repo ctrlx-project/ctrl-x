@@ -9,7 +9,7 @@ api = Blueprint('api', __name__, static_folder='static', template_folder='templa
 def _api():
     return success_resp("API is running")
 
-@api.route('/getscans', methods=['GET'])
+@api.route('/getscans', methods=['GET','POST'])
 def get_scans():
 
     # Function to parse result object and return a list of python dictionaries
@@ -44,6 +44,15 @@ def get_scans():
             return error_resp(f"IP is required for a POST request to this endpoint.")
 
 
+@api.route('/getscanip', methods=['GET','POST'])
+def get_scan_ip():
+    if request.method == 'GET':
+        stmt = db.select(Scan.ip)
+        if db.session.execute(stmt).first:
+            result = db.session.execute(stmt).scalars().all()
+            return {"ips":result}
+        else:
+            return error_resp("No scans yet!")
 
 
 
