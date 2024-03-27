@@ -48,12 +48,11 @@ def getDescription(cveList: list) -> str:
                                              descriptions += f" CVSS score is {cvssData.get('baseScore')}"
      return descriptions, CVSS
 
-print("Length of CVE: ", len(cveList))
-descriptions, CVSS = getDescription(cveList)
-print(CVSS)
-print("Length of CVSS: ", len(CVSS))
-print(descriptions)
-exit()
+# print("Length of CVE: ", len(cveList))
+# descriptions, CVSS = getDescription(cveList)
+# print(CVSS)
+# print("Length of CVSS: ", len(CVSS))
+# print(descriptions)
 
 pretrained = "openchat/openchat_3.5"
 # pretrained = "google/gemma-2b-it"
