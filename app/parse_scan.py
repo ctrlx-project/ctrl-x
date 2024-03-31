@@ -1,16 +1,16 @@
 import threading
 
+from flask import request
 from sys import argv
 from datetime import datetime
 from utils import success_resp, error_resp, load_json
 from app import create_app
-from flask import request
 
 app = create_app()
 
 
 
-def get_CVE(string:str)->set:
+def get_cve(string:str)->set:
     """Parses a given string and returns a list of all CVEs included on it.
 
     Args:
@@ -95,13 +95,13 @@ def parse_scan(scan_result:dict)->dict:
                             result[network]["ports"][port]["service"] = service
                         vulner = port_result.get("script",{}).get("vulners")
                         if vulner and isinstance(vulner, str):
-                            result[network]["ports"][port]["vulner"] = list(get_CVE(vulner))     
+                            result[network]["ports"][port]["vulner"] = list(get_cve(vulner))
     return result
 
 
 @app.route('/', methods=['POST'])
 def index():
-    scan_id = request.form.get('sid')   
+    scan_id = request.form.get('sid') 
     if scan_id:
         # todo: retrieve parsed scan from the database
         json_scan = {}

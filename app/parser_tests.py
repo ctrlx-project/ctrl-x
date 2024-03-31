@@ -33,7 +33,7 @@ def test_get_cve():
                      'CVE-2009-1891', 'CVE-2011-4415', 'CVE-2012-0053',
                      'CVE-2011-4317', 'CVE-2009-0023', 'CVE-2011-3607',
                      'CVE-2012-0031'}
-    cves = parse_scan.get_CVE(SCAN["scan"]["10.10.0.14"]["tcp"]["80"]["script"]["vulners"])
+    cves = parse_scan.get_cve(SCAN["scan"]["10.10.0.14"]["tcp"]["80"]["script"]["vulners"])
     print(cves == expected_cves)
 
 def test_parse_scan():
