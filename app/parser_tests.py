@@ -12,7 +12,7 @@ with open(SCAN_PATH) as json_file:
     SCAN = json.load(json_file)
 
 def test_load_json():
-    loaded_json = parse_scan.loadJSON(SCAN_PATH)
+    loaded_json = parse_scan.load_json(SCAN_PATH)
     print(loaded_json == SCAN)
 
 def test_get_cve():

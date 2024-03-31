@@ -1,23 +1,14 @@
-import json
+import threading
+
 from sys import argv
-from typing import Any
+from datetime import datetime
+from utils import success_resp, error_resp, load_json
+from app import create_app
+from flask import request
+
+app = create_app()
 
 
-def loadJSON(file_path: str) -> dict | list:
-    """Loads the file located at the given path.
-
-    Args:
-        (str): Path of the file to be loaded
-
-    Returns:
-        (dict | list): Object with contents of the loaded JSON file
-    """
-    try:
-        with open(file_path, "r") as json_file: 
-            return json.load(json_file)
-    except FileNotFoundError:
-        print(f"File {file_path} does not exist")
-        exit(1)
 
 def get_CVE(string:str)->set:
     """Parses a given string and returns a list of all CVEs included on it.
@@ -31,18 +22,18 @@ def get_CVE(string:str)->set:
     index = string.find("CVE")
     result = set()
     while index != -1:
-        finalIndex = -1
+        final_index = -1
         for i in range(index, len(string)):
             if string[i] == "\n" or string[i] == "\t":
-                finalIndex = i
+                final_index = i
                 break
-        result.add(string[index:finalIndex])
-        string = string[finalIndex:]
-        index = string.find("CVE") 
+        result.add(string[index:final_index])
+        string = string[final_index:]
+        index = string.find("CVE")
     return result
 
 
-def parse_scan(scanResult:dict)->dict:
+def parse_scan(scan_result:dict)->dict:
     """ Parse a single scan dictionary and extract useful informations.
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
@@ -68,7 +59,7 @@ def parse_scan(scanResult:dict)->dict:
         }}
     """
     result = {}
-    scan = scanResult.get("scan")
+    scan = scan_result.get("scan")
     if scan is None:
         return {}
     if (len(scan.keys()) < 1):
@@ -103,19 +94,30 @@ def parse_scan(scanResult:dict)->dict:
                             service = f'{product} {version}'.strip()
                             result[network]["ports"][port]["service"] = service
                         vulner = port_result.get("script",{}).get("vulners")
-                        if vulner and type(vulner) == str:
+                        if vulner and isinstance(vulner, str):
                             result[network]["ports"][port]["vulner"] = list(get_CVE(vulner))     
     return result
 
 
-def parse_from_JSON(file):
-    dict = loadJSON(file)
-    result = parse_scan(dict)
-    return result
+@app.route('/', methods=['POST'])
+def index():
+    scan_id = request.form.get('sid')   
+    if scan_id:
+        # todo: retrieve parsed scan from the database
+        json_scan = {}
+        scan = load_json(json_scan)
+    else:
+        return error_resp('Please provide a scan to be parsed.')
+    threading.Thread(target=parse_scan, args=scan).start()
+    return success_resp(f"Parsing job for {scan_id} dispatched at {datetime.now()}")
 
 if __name__ == "__main__":
-    if len(argv) < 2:
-        print("Usage: py parse_scan.py <file>; e.g. py scan.py seed/10.1.0.1.json")
+    if len(argv) == 1:
+        app.run(port=10000, debug=True)
+    elif len(argv) != 2:
+        print("Usage: py parse_scan.py [file_path]")
+        print("\te.g. py scan.py seed/10.1.0.1.json")
         exit(1)
-    result = parse_from_JSON(argv[1])
-    print(result)
+    loaded_scan = load_json(argv[1])
+    parsed_scan = parse_scan(loaded_scan)
+    print(parsed_scan)
