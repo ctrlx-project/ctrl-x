@@ -101,7 +101,8 @@ def parse_scan(scan_result:dict)->dict:
 
 @app.route('/', methods=['POST'])
 def index():
-    scan_id = request.form.get('sid') 
+    scan_id = request.form.get('sid')
+    scan = request.form.get('scan.json')
     if scan_id:
         # todo: retrieve parsed scan from the database
         json_scan = {}
