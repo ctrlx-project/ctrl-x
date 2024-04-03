@@ -103,7 +103,7 @@ def getDescription(cveList: list) -> str:
      return descriptions, CVSS
 
 def descriptionToMD(descriptions:list, CVSS: list) -> str:
-     text = "**Vulnerabilities:**\n"
+     text = "# Vulnerabilities\n"
      for i in range(len(descriptions)):
           text += f"* {descriptions[i]}\n\t* Its CVE number is {CVSS[i][0]}.\n"
           if CVSS[i][1]:
@@ -126,7 +126,7 @@ tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
 model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=accessToken)
 descriptionText = "\n".join(descriptions)
 
-input_text =  f"""Generate the potential impact for each of the below vulnerabilities as markdown, make each vulnerability heading bolded:
+input_text =  f"""Generate the potential impact for each of the below vulnerabilities as markdown, give each vulnerability a bolded heading:
 {descriptionText}
 Generated text starts here:
 # Potential Impacts
@@ -167,10 +167,8 @@ print(result)
 # end = time.time()
 # print("Output tokenized: ", end -start)
 
-input_text =  f"""Generate a mitigation strategies for the below vulnerabilities as markdown, make each vulnerability heading bolded:
+input_text =  f"""Generate a mitigation strategies for the below vulnerabilities as markdown, give each vulnerability a bolded heading:
 {descriptionText}
-
-
 Generated text starts here:
 # Mitigation Strategies
 """
