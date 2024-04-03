@@ -9,59 +9,59 @@ accessToken = "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"
 # {host: {port: {worked: [CVE], not_worked: [CVE]}}}
 # """
 
-# cveList = ["CVE-2012-0814", "CVE-2008-1657", "CVE-2011-2168", "CVE-2011-4327","CVE-2008-5161","CVE-2010-4478","CVE-2011-5000","CVE-2008-3259","CVE-2010-5107","CVE-2011-1013", "CVE-2010-4754", "CVE-2010-4755"]
+cveList = ["CVE-2012-0814", "CVE-2008-1657", "CVE-2011-2168", "CVE-2011-4327","CVE-2008-5161","CVE-2010-4478","CVE-2011-5000","CVE-2008-3259","CVE-2010-5107","CVE-2011-1013", "CVE-2010-4754", "CVE-2010-4755"]
 
-cveList = [
-     "CVE-2014-0231",
-     "CVE-2009-1891",
-     "CVE-2012-2687",
-     "CVE-2009-3094",
-     "CVE-2016-4975",
-     "CVE-2008-0456",
-     "CVE-2017-9798",
-     "CVE-2008-2364",
-     "CVE-2016-8743",
-     "CVE-2014-0226",
-     "CVE-2011-441",
-     "CVE-2017-3167",
-     "CVE-2013-6438",
-     "CVE-2012-4558",
-     "CVE-2009-1956",
-     "CVE-2012-0031",
-     "CVE-2014-0098",
-     "CVE-2012-3499",
-     "CVE-2009-1195",
-     "CVE-2011-4317",
-     "CVE-2011-3368",
-     "CVE-2017-7679",
-     "CVE-2009-0023",
-     "CVE-2009-2699",
-     "CVE-2012-0883",
-     "CVE-2013-1896",
-     "CVE-2014-0118",
-     "CVE-2012-0053",
-     "CVE-2010-1623",
-     "CVE-2011-3192",
-     "CVE-2009-1890",
-     "CVE-2015-3183",
-     "CVE-2013-5704",
-     "CVE-2007-6750",
-     "CVE-2016-5387",
-     "CVE-2009-3560",
-     "CVE-2008-2939",
-     "CVE-2009-3555",
-     "CVE-2010-1452",
-     "CVE-2010-0408",
-     "CVE-2011-3639",
-     "CVE-2017-9788",
-     "CVE-2010-0434",
-     "CVE-2011-4415",
-     "CVE-2008-0005",
-     "CVE-2008-0455",
-     "CVE-2013-1862",
-     "CVE-2009-3095",
-     "CVE-2011-3607"
-]
+# cveList = [
+#      "CVE-2014-0231",
+#      "CVE-2009-1891",
+#      "CVE-2012-2687",
+#      "CVE-2009-3094",
+#      "CVE-2016-4975",
+#      "CVE-2008-0456",
+#      "CVE-2017-9798",
+#      "CVE-2008-2364",
+#      "CVE-2016-8743",
+#      "CVE-2014-0226",
+#      "CVE-2011-441",
+#      "CVE-2017-3167",
+#      "CVE-2013-6438",
+#      "CVE-2012-4558",
+#      "CVE-2009-1956",
+#      "CVE-2012-0031",
+#      "CVE-2014-0098",
+#      "CVE-2012-3499",
+#      "CVE-2009-1195",
+#      "CVE-2011-4317",
+#      "CVE-2011-3368",
+#      "CVE-2017-7679",
+#      "CVE-2009-0023",
+#      "CVE-2009-2699",
+#      "CVE-2012-0883",
+#      "CVE-2013-1896",
+#      "CVE-2014-0118",
+#      "CVE-2012-0053",
+#      "CVE-2010-1623",
+#      "CVE-2011-3192",
+#      "CVE-2009-1890",
+#      "CVE-2015-3183",
+#      "CVE-2013-5704",
+#      "CVE-2007-6750",
+#      "CVE-2016-5387",
+#      "CVE-2009-3560",
+#      "CVE-2008-2939",
+#      "CVE-2009-3555",
+#      "CVE-2010-1452",
+#      "CVE-2010-0408",
+#      "CVE-2011-3639",
+#      "CVE-2017-9788",
+#      "CVE-2010-0434",
+#      "CVE-2011-4415",
+#      "CVE-2008-0005",
+#      "CVE-2008-0455",
+#      "CVE-2013-1862",
+#      "CVE-2009-3095",
+#      "CVE-2011-3607"
+# ]
 
 # Can also get CVSS score
 def getDescription(cveList: list) -> str:
@@ -106,9 +106,9 @@ def descriptionToMD(descriptions:list, CVSS: list) -> str:
      text = "**Vulnerabilities:**\n"
      for i in range(len(descriptions)):
           text += f"* {descriptions[i]}\n\t* Its CVE number is {CVSS[i][0]}.\n"
-          if CVSS[i][i]:
+          if CVSS[i][1]:
                text += f"\t* Its CVSS score is {CVSS[i][1]}.\n"
-          if CVSS[i][0]:
+          if CVSS[i][2]:
                text += f"\t* Its CVSS vector is {CVSS[i][2]}\n"
      return text
 
@@ -126,9 +126,10 @@ tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
 model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=accessToken)
 descriptionText = "\n".join(descriptions)
 
-input_text =  f"""Generate the potential impact for each of the below vulnerabilities as markdown:
+input_text =  f"""Generate the potential impact for each of the below vulnerabilities as markdown, make each vulnerability heading bolded:
 {descriptionText}
 Generated text starts here:
+# Potential Impacts
 """
 
 separator = "Generated text starts here:"
@@ -166,9 +167,12 @@ print(result)
 # end = time.time()
 # print("Output tokenized: ", end -start)
 
-input_text =  f"""Generate a mitigation strategies for the below vulnerabilities as markdown:
+input_text =  f"""Generate a mitigation strategies for the below vulnerabilities as markdown, make each vulnerability heading bolded:
 {descriptionText}
+
+
 Generated text starts here:
+# Mitigation Strategies
 """
 
 input_ids = tokenizer(input_text, return_tensors="pt").to("cuda").input_ids
