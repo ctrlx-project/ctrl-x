@@ -11,48 +11,27 @@ def _api():
 
 @api.route('/getscans', methods=['GET','POST'])
 def get_scans():
-
-    # Function to parse result object and return a list of python dictionaries
-    def parse_query(query, fields) -> list:
-        num_fields = len(fields)
-        ret = []
-        for scan in query:
-            scans = [scan.id, scan.ip, scan.scan_data, scan.start_time, scan.end_time, scan.status]
-            scan_dict = {fields[idx]:scans[idx] for idx in range(num_fields)}
-            ret.append(scan_dict)
-        return ret
-    
-    fields = ('id', 'ip', 'scan_data', 'start_time', 'end_time', 'status')
     # if GET method, return all scans in database
     if request.method == 'GET':
-        stmt = db.select(Scan)
-        if db.session.execute(stmt).first:
-            result = db.session.execute(stmt).scalars().all()
-            return parse_query(result, fields)
+        result = Scan.query.all()
+        if result:
+            ret = [scan.info for scan in result]
+            return jsonify(ret)
         else:
             return error_resp("No scans yet!")
     # if POST method, return scans with matching IP's
     elif request.method == "POST":
-        if request_ip := str(escape(request.form.ip)):
-            stmt = db.select(Scan).where(Scan.ip==request_ip)
-            if db.session.execute(stmt).first():
-                result = db.session.execute(stmt).scalars().all()
-                return parse_query(result,fields)
+        if ip:=request.form.get('ip'):
+            request_ip = str(escape(ip))
+            result = Scan.query.filter(Scan.ip==request_ip)
+            if result:
+                ret = [scan.info for scan in result]
+                return jsonify(ret)
             else:
                 return error_resp(f"Scans with ip {request_ip} not found.")
         else:
-            return error_resp(f"IP is required for a POST request to this endpoint.")
+            return error_resp("IP is required for this method to be used.")
 
-
-@api.route('/getscanip', methods=['GET','POST'])
-def get_scan_ip():
-    if request.method == 'GET':
-        stmt = db.select(Scan.ip)
-        if db.session.execute(stmt).first:
-            result = db.session.execute(stmt).scalars().all()
-            return {"ips":result}
-        else:
-            return error_resp("No scans yet!")
 
 
 

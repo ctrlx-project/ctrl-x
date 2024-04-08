@@ -8,11 +8,21 @@ function main() {
         type: "GET",
         success: (scan) => {
             scan.forEach((scan) => {
-                if (scan.status != "running")
-                    populateCard(scan);
+                populateCard(scan);
             });
         }
     });
+
+    $.ajax({
+        url: "/api/getscans",
+        type: "POST",
+        data:{
+            ip: "10.10.0.1/24"
+        },
+        success: (scan1) => {
+            populateCard(scan1)
+        }
+    })
 
     function populateCard(scan_data) {
         //create new Card

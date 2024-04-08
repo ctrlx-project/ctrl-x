@@ -12,6 +12,16 @@ class Scan(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(15))
 
+    @property
+    def info(self):
+        return {
+            'id':self.id,
+            'ip':self.ip,
+            'scan_data':self.scan_data,
+            'start_time':self.start_time,
+            'end_time':self.end_time,
+            'status':self.status,
+        }
 
 class Setting(db.Model):
     __tablename__ = 'settings'
