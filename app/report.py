@@ -187,7 +187,7 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
      return report
 
 if __name__ == "__main__":
-     exploit = loadJSON("/seed/exploit/metasploitable.json")
+     exploit = loadJSON("./seed/exploit/metasploitable.json")
      pretrained = "google/gemma-2b-it"
      tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
      model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=accessToken)
