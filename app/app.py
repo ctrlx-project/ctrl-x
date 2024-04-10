@@ -12,9 +12,9 @@ from celery import Celery, Task
 class Env:
     postgres_url: str = environ.get("POSTGRES_URL", default="postgresql://admin:admin@localhost:5432/ctrl-x")
     scannerd_url: str = environ.get("SCANNERD_URL", default="http://localhost:8000")
-    broker_url = environ.get("RABBITMQ_URL", default="amqp://admin:admin@localhost:5672/")
-    result_backend = environ.get("POSTGRES_URL", default="postgresql://admin:admin@localhost:5432/ctr-x-mq")
-    task_ignore_result = True
+    broker_url: str = environ.get("RABBITMQ_URL", default="amqp://admin:admin@localhost:5672")
+    result_backend: str = environ.get("POSTGRES_URL", default="db+postgresql://admin:admin@localhost:5432/ctrl-x")
+    task_ignore_result: bool = True
 
 
 env = Env()
@@ -48,6 +48,7 @@ def create_app() -> Flask:
             broker_url=env.broker_url,
             result_backend=env.result_backend,
             task_ignore_result=env.task_ignore_result,
+            broker_connection_retry_on_startup=True,
         ),
     )
 
