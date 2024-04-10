@@ -48,7 +48,7 @@ def getDescription(exploits: dict) -> tuple[list, list, list]:
      # Get the desciption from a dictionary that contain output from metasploit for a port
      # Can also get CVSS score if there is CVE number
      descriptions = []
-     CVSS = []
+     CVSS = [] # A list of list, inner list is [CVE, CVSS score, CVSS vector]
      tables = []
      remaining = len(exploits)
      for exploitName in exploits.keys():
