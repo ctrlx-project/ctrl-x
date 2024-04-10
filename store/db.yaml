@@ -13,18 +13,21 @@ services:
       - 'POSTGRES_DB=ctrl-x'
 
   rabbitmq:
-    image: rabbitmq:latest
+    image: 'rabbitmq:3.12.7-management'
     container_name: 'ctrl-x-rabbitmq'
     environment:
       - 'RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}'
       - 'RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS:-admin}'
     volumes:
-      - 'ctrl-x-rabbitmq/etc/:/etc/rabbitmq/'
-      - 'ctrl-x-rabbitmq/data/:/var/lib/rabbitmq/'
-      - 'ctrl-x-rabbitmq/logs/:/var/log/rabbitmq/'
+      - 'ctrl-x-rabbitmq-etc:/etc/rabbitmq/'
+      - 'ctrl-x-rabbitmq-data:/var/lib/rabbitmq/'
+      - 'ctrl-x-rabbitmq-logs:/var/log/rabbitmq/'
     ports:
       - '5672:5672'
       - '15672:15672'
 
 volumes:
   ctrl_x:
+  ctrl-x-rabbitmq-etc:
+  ctrl-x-rabbitmq-data:
+  ctrl-x-rabbitmq-logs:
