@@ -176,6 +176,7 @@ Multiple stack-based buffer overflows in the CertDecoder::GetName function in sr
 | Payload Name | generic/custom |
 | --- | --- |
 | Payload Description | Use custom string or file as payload. Set either PAYLOADFILE or PAYLOADSTR. |
+
 Multiple buffer overflows in yaSSL 1.7.5 and earlier, as used in MySQL and possibly other products, allow remote attackers to execute arbitrary code via (1) the ProcessOldClientHello function in handshake.cpp or (2) "input_buffer& operator>>" in yassl_imp.cpp.
 * Its CVE number is CVE-2008-0226.
 * Its CVSS score is 7.5.

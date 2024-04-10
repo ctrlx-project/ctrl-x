@@ -23,7 +23,7 @@ def loadJSON(filepath:str)->dict:
     return dict
 
 def getTable(vulner: dict)->str:
-     # Generate a markedown table for each port
+     # Generate a markedown table for each vulnerability
      table = f"\n| Exploit Name | {vulner.get('exploit')} |\n| --- | --- |\n"
      if vulner.get("exploit_options"):
           options = vulner.get("exploit_options")
@@ -40,11 +40,12 @@ def getTable(vulner: dict)->str:
           options = vulner.get("payload_options")
           for option_name in options.keys():
                table += f"| {option_name} | {str(options.get(option_name))} |\n"
+     table += "\n"
      return table
 
 
 def getDescription(exploits: dict) -> tuple[list, list, list]:
-     # Get the desciption from a dictionary that contain output from metasploit
+     # Get the desciption from a dictionary that contain output from metasploit for a port
      # Can also get CVSS score if there is CVE number
      descriptions = []
      CVSS = []
@@ -186,7 +187,7 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
      return report
 
 if __name__ == "__main__":
-     exploit = loadJSON("app/seed/exploit/metasploitable.json")
+     exploit = loadJSON("/seed/exploit/metasploitable.json")
      pretrained = "google/gemma-2b-it"
      tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
      model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=accessToken)
