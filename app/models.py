@@ -12,6 +12,17 @@ class Scan(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(15))
 
+    @property
+    def info(self):
+        return {
+            'id':self.id,
+            'ip':self.ip,
+            'scan_data':self.scan_data,
+            'start_time':self.start_time,
+            'end_time':self.end_time,
+            'status':self.status,
+        }
+
 class RawMeta(db.Model):
     __tablename__ = 'raw-meta'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -29,6 +40,7 @@ class ParsedMeta(db.Model):
     start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(15))
+
 
 class Setting(db.Model):
     __tablename__ = 'settings'
