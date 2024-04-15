@@ -41,7 +41,6 @@ class ParsedMeta(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(15))
 
-
 class Setting(db.Model):
     __tablename__ = 'settings'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -55,3 +54,11 @@ class Setting(db.Model):
             'key': self.key,
             'value': self.value
         }
+
+class Report(db.Model):
+    __tablename__ = 'report'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user = db.Column(db.Integer, nullable=False)
+    ip = db.Column(db.String(16), nullable=False)
+    time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+    status = db.Column(db.String())
