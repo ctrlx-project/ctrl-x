@@ -23,7 +23,7 @@ def show_report(id):
         test_file = open(test_path, "r")
         report_markdown = test_file.read()
         report = Report(user=0, ip="10.10.0.14", content=report_markdown)
-        db.session.add()
+        db.session.add(report)
         db.session.commit()
         print("added")
     report_html = markdown.markdown(report_markdown, extensions=['tables', "sane_lists"])
