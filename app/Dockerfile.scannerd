@@ -1,0 +1,14 @@
+FROM python:3.10-bullseye
+
+COPY . /app
+WORKDIR /app
+
+RUN apt update \
+  && rm -rf /var/lib/apt/lists/ \
+  && pip3 install -r dev-req.txt
+
+ENV POSTGRES_URL=${POSTGRES_URL}
+
+EXPOSE 8000
+
+CMD gunicorn -b 0.0.0.0:8000 -w 4 scannerd:app

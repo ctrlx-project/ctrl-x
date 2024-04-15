@@ -1,0 +1,10 @@
+[
+  {
+    "key": "nmap_scan_args",
+    "value": "-Pn -sS -sV -A -T5 --script=default,discovery,vuln"
+  },
+  {
+    "key": "nameserver",
+    "value": "1.1.1.1"
+  }
+]
