@@ -43,8 +43,8 @@ for file in os.listdir(directory):
     f.close()
 
 with app.app_context():
-    db.drop_all()
-    db.create_all()
+    # db.drop_all()
+    # db.create_all()
     db.session.add_all(scans)
     db.session.commit()
 
@@ -63,8 +63,8 @@ for file in os.listdir(directory):
     f.close()
 
 with app.app_context():
-    db.drop_all()
-    db.create_all()
+    # db.drop_all()
+    # db.create_all()
     db.session.add_all(scans)
     db.session.commit()
 
@@ -84,8 +84,8 @@ for file in os.listdir(directory):
     f.close()
 
 with app.app_context():
-    db.drop_all()
-    db.create_all()
+    # db.drop_all()
+    # db.create_all()
     db.session.add_all(scans)
     db.session.commit()
 
