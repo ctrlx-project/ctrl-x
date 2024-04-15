@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Report
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <ul class="list-group">
+    {% for name in report_names%}
+    <li class="list-group-item"></li>
+    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/reports/{{name[0]}}">
+        {{name[1]}}
+    </a>
+    </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block imports %}
+
+{% endblock %}

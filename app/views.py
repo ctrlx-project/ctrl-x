@@ -24,3 +24,11 @@ def show_report(id):
     report_html = report_html.replace("<table>", '<table class="table">')
     report_html = Markup(report_html)
     return render_template('report.html', report=report_html)
+
+@index.route("/reports")
+def list_reports():
+    reports = Report.query.filter_by(id=id).all()
+    ret = []
+    if reports:
+            ret = [(report.id, f"Report for {report.ip} at {report.time}") for report in reports]
+    return render_template('report_list.html', report_names=ret)
