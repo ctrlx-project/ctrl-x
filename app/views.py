@@ -21,4 +21,5 @@ def show_report():
     report_markdown = test_file.read()
     report_html = markdown.markdown(report_markdown, extensions=['tables'])
     report_html = Markup(report_html)
+    report_html = report_html.replace("<table>", '<table class="table">')
     return render_template('report.html', report=report_html)
