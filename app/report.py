@@ -113,6 +113,12 @@ def descriptionToMD(descriptions:list, CVSS: list, tables: list) -> str:
      return text
 
 def generateSectionReport(sectionResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM)->str:
+     """
+     Create the markdown for all the exploited vulnerabilities in a port or all the vulnerabilities that are not exploited in a port
+     sectionResult: dictionary containing the exploit result for this section
+     tokenizer: tokenizer for the LLM
+     model: LLM model
+     """
      descriptions, CVSS, tables = getDescription(sectionResult)
      # print(len(descriptions), len(CVSS), len(tables))
      descriptionMD = descriptionToMD(descriptions, CVSS, tables)
@@ -159,13 +165,19 @@ Generated text starts here:
      return combinedOutput
 
 def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM) -> str:
-     report = ""
+     """
+     Create the markdown report
+     exploitResult: dictionary containing the exploit result
+     tokenizer: tokenizer for the LLM
+     model: LLM model
+     """
+     report = []
      for IP in exploitResult.keys():
           exploit_IP = exploitResult.get(IP)
-          report += f"# Penetration testing for {IP}\n\n"
+          report.append(f"# Penetration testing for {IP}\n\n")
           for port in exploit_IP.keys():
                exploit_port = exploit_IP.get(port)
-               report += f"## Port {port}\n"
+               report.append(f"## Port {port}\n")
                shell_exploits = {}
                failed_exploits = {}
                for exploit in exploit_port.keys():
@@ -175,16 +187,16 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
                     else:
                          failed_exploits[exploit] = exploit_port[exploit]
                if len(shell_exploits) > 0:
-                    report += "### Vulnerabilities that we exploited to get a shell\n"
-                    report += generateSectionReport(shell_exploits, tokenizer, model)
-                    report += "\n"
+                    report.append("### Vulnerabilities that we exploited to get a shell\n")
+                    report.append(generateSectionReport(shell_exploits, tokenizer, model))
+                    report.append("\n")
                if len(failed_exploits) > 0:
-                    report += "### Vulnerabilities that we are unable to exploit\n"
-                    report += generateSectionReport(failed_exploits, tokenizer, model)
-                    report += "\n"
+                    report.append("### Vulnerabilities that we are unable to exploit\n")
+                    report.append(generateSectionReport(failed_exploits, tokenizer, model))
+                    report.append("\n")
                print(f"Port {port} completed")
                # return report
-     return report
+     return "".join(report)
 
 if __name__ == "__main__":
      exploit = loadJSON("./seed/exploit/metasploitable.json")
