@@ -1,7 +1,7 @@
 from report import loadJSON, getDescription, descriptionToMD
 
 def test_report():
-    vulnerabilities = loadJSON("./seed/exploit/test.json")
+    vulnerabilities = loadJSON("./app/seed/test_report/test.json")
     assert vulnerabilities == {
     "vsftpd 2.3.4":{
         "exploit":"exploit/unix/ftp/vsftpd_234_backdoor",
