@@ -6,12 +6,6 @@ import json
 
 accessToken = "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"
 
-# """
-# {host: {port: {worked: [CVE], not_worked: [CVE]}}}
-# """
-
-# cveList = ["CVE-2012-0814", "CVE-2008-1657", "CVE-2011-2168", "CVE-2011-4327","CVE-2008-5161","CVE-2010-4478","CVE-2011-5000","CVE-2008-3259","CVE-2010-5107","CVE-2011-1013", "CVE-2010-4754", "CVE-2010-4755"]
-
 def loadJSON(filepath:str)->dict:
     # Load JSON file into a dictionary
     try:
