@@ -23,4 +23,4 @@ def show_report(id):
     report_html = markdown.markdown(report_markdown, extensions=['tables', "sane_lists"])
     report_html = report_html.replace("<table>", '<table class="table">')
     report_html = Markup(report_html)
-    return render_template('report.html', ip=report.ip, report=report_html)
+    return render_template('report.html', report=report_html)
