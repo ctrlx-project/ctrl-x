@@ -16,10 +16,11 @@ def show_scans():
 
 @index.route('/reports/<id>')
 def show_report(id):
-    report_markdown = Report.query.filter_by(id=id).first()
-    if not report_markdown:
+    report = Report.query.filter_by(id=id).first()
+    if not report:
         return abort(404)
+    report_markdown = report.content
     report_html = markdown.markdown(report_markdown, extensions=['tables', "sane_lists"])
     report_html = report_html.replace("<table>", '<table class="table">')
     report_html = Markup(report_html)
-    return render_template('report.html', report=report_html)
+    return render_template('report.html', ip=report.ip, report=report_html)
