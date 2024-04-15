@@ -19,14 +19,14 @@ def loadJSON(file_path: str) -> dict | list:
         print(f"File {file_path} does not exist")
         exit(1)
 
-def get_CVE(string:str)->set:
+def get_CVE(string:str)->list:
     """Parses a given string and returns a list of all CVEs included on it.
 
     Args:
         (dict): Dictionary output from the Nmap scan
 
     Returns:
-        (dict): Parsed scan with useful information for metasploit
+        (list): List of CVE's found.
     """
     index = string.find("CVE")
     result = set()
@@ -38,8 +38,8 @@ def get_CVE(string:str)->set:
                 break
         result.add(string[index:finalIndex])
         string = string[finalIndex:]
-        index = string.find("CVE") 
-    return result
+        index = string.find("CVE")
+    return list(result)
 
 
 def parse_scan(scanResult:dict)->dict:
@@ -104,7 +104,7 @@ def parse_scan(scanResult:dict)->dict:
                             result[network]["ports"][port]["service"] = service
                         vulner = port_result.get("script",{}).get("vulners")
                         if vulner and type(vulner) == str:
-                            result[network]["ports"][port]["vulner"] = list(get_CVE(vulner))     
+                            result[network]["ports"][port]["vulner"] = get_CVE(vulner)
     return result
 
 

@@ -1,8 +1,8 @@
 from flask import request
 import requests
 import pytest
-from ctrlx.main import app
-from ctrlx.api import api
+from main import app
+from api import api
 
 import os 
 
