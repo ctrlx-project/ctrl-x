@@ -18,24 +18,24 @@ def loadJSON(filepath:str)->dict:
 
 def getTable(vulner: dict)->str:
      # Generate a markedown table for each vulnerability
-     table = f"\n| Exploit Name | {vulner.get('exploit')} |\n| --- | --- |\n"
+     table = [f"\n| Exploit Name | {vulner.get('exploit')} |\n| --- | --- |\n"]
      if vulner.get("exploit_options"):
           options = vulner.get("exploit_options")
           for option_name in options.keys():
-               table += f"| {option_name} | {str(options.get(option_name))} |\n"
+               table.append(f"| {option_name} | {str(options.get(option_name))} |\n")
           
      if vulner.get("payload"):
-          table += f"\n| Payload Name | {vulner.get('payload')} |\n| --- | --- |\n"
+          table.append(f"\n| Payload Name | {vulner.get('payload')} |\n| --- | --- |\n")
      
      if vulner.get("payload_description"):
-          table += f"| Payload Description | {vulner.get('payload_description')} |\n"
+          table.append(f"| Payload Description | {vulner.get('payload_description')} |\n")
 
      if vulner.get("payload_options"):
           options = vulner.get("payload_options")
           for option_name in options.keys():
-               table += f"| {option_name} | {str(options.get(option_name))} |\n"
-     table += "\n"
-     return table
+               table.append(f"| {option_name} | {str(options.get(option_name))} |\n")
+     table.append("\n")
+     return "".join(table)
 
 
 def getDescription(exploits: dict) -> tuple[list, list, list]:
@@ -192,7 +192,8 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
                # return report
      return "".join(report)
 
-if __name__ == "__main__":
+
+def main():
      exploit = loadJSON("./seed/exploit/metasploitable.json")
      pretrained = "google/gemma-2b-it"
      tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
@@ -202,3 +203,6 @@ if __name__ == "__main__":
      outputFile.write(result)
      outputFile.close()
      print("Finished")
+
+if __name__ == "__main__":
+     main()
