@@ -6,9 +6,10 @@ Report
 
 {% block body %}
 <div class="container">
+    {{message}}
     <ul class="list-group">
     {% for name in report_names%}
-    <li class="list-group-item"></li>
+    <li class="list-group-item">
     <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/reports/{{name[0]}}">
         {{name[1]}}
     </a>
