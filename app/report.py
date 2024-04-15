@@ -94,17 +94,17 @@ def getDescription(exploits: dict) -> tuple[list, list, list]:
      return descriptions, CVSS, tables
 
 def descriptionToMD(descriptions:list, CVSS: list, tables: list) -> str:
-     text = ""
+     text = []
      for i in range(len(descriptions)):
-          text += f"{descriptions[i]}\n"
+          text.append(f"{descriptions[i]}\n")
           if CVSS[i][0]:
-               text += f"* Its CVE number is {CVSS[i][0]}.\n"
+               text.append(f"\n* Its CVE number is {CVSS[i][0]}.\n")
           if CVSS[i][1]:
-               text += f"* Its CVSS score is {CVSS[i][1]}.\n"
+               text.append(f"* Its CVSS score is {CVSS[i][1]}.\n")
           if CVSS[i][2]:
-               text += f"* Its CVSS vector is {CVSS[i][2]}\n"
-          text += tables[i]
-     return text
+               text.append(f"* Its CVSS vector is {CVSS[i][2]}\n")
+          text.append(tables[i])
+     return "".join(text)
 
 def generateSectionReport(sectionResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM)->str:
      """
