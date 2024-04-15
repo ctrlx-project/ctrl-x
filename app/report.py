@@ -6,12 +6,6 @@ import json
 
 accessToken = "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"
 
-# """
-# {host: {port: {worked: [CVE], not_worked: [CVE]}}}
-# """
-
-# cveList = ["CVE-2012-0814", "CVE-2008-1657", "CVE-2011-2168", "CVE-2011-4327","CVE-2008-5161","CVE-2010-4478","CVE-2011-5000","CVE-2008-3259","CVE-2010-5107","CVE-2011-1013", "CVE-2010-4754", "CVE-2010-4755"]
-
 def loadJSON(filepath:str)->dict:
     # Load JSON file into a dictionary
     try:
@@ -24,24 +18,24 @@ def loadJSON(filepath:str)->dict:
 
 def getTable(vulner: dict)->str:
      # Generate a markedown table for each vulnerability
-     table = f"\n| Exploit Name | {vulner.get('exploit')} |\n| --- | --- |\n"
+     table = [f"\n| Exploit Name | {vulner.get('exploit')} |\n| --- | --- |\n"]
      if vulner.get("exploit_options"):
           options = vulner.get("exploit_options")
           for option_name in options.keys():
-               table += f"| {option_name} | {str(options.get(option_name))} |\n"
+               table.append(f"| {option_name} | {str(options.get(option_name))} |\n")
           
      if vulner.get("payload"):
-          table += f"\n| Payload Name | {vulner.get('payload')} |\n| --- | --- |\n"
+          table.append(f"\n| Payload Name | {vulner.get('payload')} |\n| --- | --- |\n")
      
      if vulner.get("payload_description"):
-          table += f"| Payload Description | {vulner.get('payload_description')} |\n"
+          table.append(f"| Payload Description | {vulner.get('payload_description')} |\n")
 
      if vulner.get("payload_options"):
           options = vulner.get("payload_options")
           for option_name in options.keys():
-               table += f"| {option_name} | {str(options.get(option_name))} |\n"
-     table += "\n"
-     return table
+               table.append(f"| {option_name} | {str(options.get(option_name))} |\n")
+     table.append("\n")
+     return "".join(table)
 
 
 def getDescription(exploits: dict) -> tuple[list, list, list]:
@@ -100,19 +94,25 @@ def getDescription(exploits: dict) -> tuple[list, list, list]:
      return descriptions, CVSS, tables
 
 def descriptionToMD(descriptions:list, CVSS: list, tables: list) -> str:
-     text = ""
+     text = []
      for i in range(len(descriptions)):
-          text += f"{descriptions[i]}\n"
+          text.append(f"{descriptions[i]}\n")
           if CVSS[i][0]:
-               text += f"* Its CVE number is {CVSS[i][0]}.\n"
+               text.append(f"\n* Its CVE number is {CVSS[i][0]}.\n")
           if CVSS[i][1]:
-               text += f"* Its CVSS score is {CVSS[i][1]}.\n"
+               text.append(f"* Its CVSS score is {CVSS[i][1]}.\n")
           if CVSS[i][2]:
-               text += f"* Its CVSS vector is {CVSS[i][2]}\n"
-          text += tables[i]
-     return text
+               text.append(f"* Its CVSS vector is {CVSS[i][2]}\n")
+          text.append(tables[i])
+     return "".join(text)
 
 def generateSectionReport(sectionResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM)->str:
+     """
+     Create the markdown for all the exploited vulnerabilities in a port or all the vulnerabilities that are not exploited in a port
+     sectionResult: dictionary containing the exploit result for this section
+     tokenizer: tokenizer for the LLM
+     model: LLM model
+     """
      descriptions, CVSS, tables = getDescription(sectionResult)
      # print(len(descriptions), len(CVSS), len(tables))
      descriptionMD = descriptionToMD(descriptions, CVSS, tables)
@@ -159,13 +159,19 @@ Generated text starts here:
      return combinedOutput
 
 def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM) -> str:
-     report = ""
+     """
+     Create the markdown report
+     exploitResult: dictionary containing the exploit result
+     tokenizer: tokenizer for the LLM
+     model: LLM model
+     """
+     report = []
      for IP in exploitResult.keys():
           exploit_IP = exploitResult.get(IP)
-          report += f"# Penetration testing for {IP}\n\n"
+          report.append(f"# Penetration testing for {IP}\n\n")
           for port in exploit_IP.keys():
                exploit_port = exploit_IP.get(port)
-               report += f"## Port {port}\n"
+               report.append(f"## Port {port}\n")
                shell_exploits = {}
                failed_exploits = {}
                for exploit in exploit_port.keys():
@@ -175,18 +181,19 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
                     else:
                          failed_exploits[exploit] = exploit_port[exploit]
                if len(shell_exploits) > 0:
-                    report += "### Vulnerabilities that we exploited to get a shell\n"
-                    report += generateSectionReport(shell_exploits, tokenizer, model)
-                    report += "\n"
+                    report.append("### Vulnerabilities that we exploited to get a shell\n")
+                    report.append(generateSectionReport(shell_exploits, tokenizer, model))
+                    report.append("\n")
                if len(failed_exploits) > 0:
-                    report += "### Vulnerabilities that we are unable to exploit\n"
-                    report += generateSectionReport(failed_exploits, tokenizer, model)
-                    report += "\n"
+                    report.append("### Vulnerabilities that we are unable to exploit\n")
+                    report.append(generateSectionReport(failed_exploits, tokenizer, model))
+                    report.append("\n")
                print(f"Port {port} completed")
                # return report
-     return report
+     return "".join(report)
 
-if __name__ == "__main__":
+
+def main():
      exploit = loadJSON("./seed/exploit/metasploitable.json")
      pretrained = "google/gemma-2b-it"
      tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
@@ -196,3 +203,6 @@ if __name__ == "__main__":
      outputFile.write(result)
      outputFile.close()
      print("Finished")
+
+if __name__ == "__main__":
+     main()

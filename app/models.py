@@ -61,4 +61,4 @@ class Report(db.Model):
     user = db.Column(db.Integer, nullable=False)
     ip = db.Column(db.String(16), nullable=False)
     time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
-    status = db.Column(db.String())
+    content = db.Column(db.String())
