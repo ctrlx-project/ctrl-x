@@ -27,8 +27,12 @@ def show_report(id):
 
 @index.route("/reports")
 def list_reports():
-    reports = Report.query.filter_by(id=id).all()
+    user = 0
+    reports = Report.query.filter_by(user=user).all()
     ret = []
     if reports:
             ret = [(report.id, f"Report for {report.ip} at {report.time}") for report in reports]
-    return render_template('report_list.html', report_names=ret)
+    message = ""
+    if len(ret) == 0:
+        message = "You have not done any scan"
+    return render_template('report_list.html', report_names=ret, message=message)

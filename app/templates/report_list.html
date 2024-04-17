@@ -16,14 +16,16 @@ Report
           </thead>
           <tbody>
             {% for name in report_names%}
-            <li class="list-group-item">
             <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/reports/{{name[0]}}">
-                {{name[1]}}
+                <tr>
+                    <td>{{name[1]}}</td>
+                    <td>{{name[1]}}</td>
+                    <td>{{name[1]}}</td>
+                </tr>
             </a>
-            </li>
             {% endfor %}
           </tbody>
-    </ul>
+    </table>
 </div>
 {% endblock %}
 
