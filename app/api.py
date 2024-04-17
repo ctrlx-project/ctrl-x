@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint,request,escape,jsonify
 from models import db, Scan
 from utils import success_resp, error_resp, validate_scan_job
 from scannerd import scan, test_scannerd
@@ -27,7 +27,7 @@ def test_mq():
     }
 
 
-@api.route('/scan', methods=['POST'])
+@api.route('/scan-new', methods=['POST'])
 def _scan_():
     ip_block = request.form.get('ip_block')
     if not ip_block:
@@ -37,3 +37,25 @@ def _scan_():
         return success_resp('Scan job dispatched')
     else:
         return error_resp('Invalid IP/FQDN')
+
+      
+@api.route('/scan', methods=['GET','POST'])
+def scans():
+    # if GET method, return all scans in database
+    if request.method == 'GET':
+        if ip:=request.args.get('ip'):
+            request_ip = str(escape(ip))
+            result = Scan.query.filter(Scan.ip==request_ip)
+            if result:
+                ret = [scan.info for scan in result]
+                return jsonify(ret)
+            else:
+                return error_resp(f"Scans with ip {request_ip} not found.")
+        else:
+            result = Scan.query.all()
+            if result:
+                ret = [scan.info for scan in result]
+                return jsonify(ret)
+            else:
+                return error_resp("No scans yet!")
+    # if POST method, return scans with matching IP's
