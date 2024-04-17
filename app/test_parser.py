@@ -1,12 +1,10 @@
 """Tests the parse_scan module."""
 
 import json
-import pprint
 import os
 import pytest
 
 import parse_scan
-
 
 directory = os.path.dirname(__file__)
 SCAN_PATH = os.path.join(directory, "seed/nmap/10.10.0.14.json")
@@ -16,8 +14,6 @@ with open(SCAN_PATH, encoding="UTF-8") as json_scan:
     SCAN = json.load(json_scan)
 with open(PARSED_SCAN_PATH, encoding="UTF-8") as json_parsed:
     PARSED_SCAN = json.load(json_parsed)
-
-
 
 def test_load_json():
     """Tests load_json function."""

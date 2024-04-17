@@ -1,7 +1,5 @@
 import json
 from sys import argv
-from typing import Any
-
 
 def loadJSON(file_path: str) -> dict | list:
     """Loads the file located at the given path.
