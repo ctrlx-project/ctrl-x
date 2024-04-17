@@ -31,7 +31,7 @@ def list_reports():
     reports = Report.query.filter_by(user=user).all()
     ret = []
     if reports:
-            ret = [(report.id, f"Report for {report.ip} at {report.time}") for report in reports]
+            ret = [(report.id, report.ip, report.time) for report in reports]
     message = ""
     if len(ret) == 0:
         message = "You have not done any scan"
