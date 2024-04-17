@@ -1,11 +1,16 @@
 from dataclasses import dataclass
 from os import environ
+from sys import stderr
 
 from flask import Flask
-from models import db
+from models import db, Setting
 from flask_migrate import Migrate
 
 from celery import Celery, Task
+
+from dns import resolver
+import threading
+from time import sleep
 
 
 @dataclass
@@ -14,7 +19,34 @@ class Env:
     scannerd_url: str = environ.get("SCANNERD_URL", default="http://localhost:8000")
     broker_url: str = environ.get("RABBITMQ_URL", default="amqp://admin:admin@localhost:5672")
     result_backend: str = environ.get("POSTGRES_URL", default="db+postgresql://admin:admin@localhost:5432/ctrl-x")
+
+    app = None
+
+    # For scannerd
     task_ignore_result: bool = True
+    nmap_scan_args = "-Pn -sS -sV -A -T5 --script=default,discovery,vuln"
+    resolver = resolver.Resolver()
+    resolver.nameservers = ['1.1.1.1', '8.8.8.8']
+
+    stop_event = threading.Event()
+
+    def update(self):
+        with self.app.app_context():
+            self.nmap_scan_args = Setting.query.filter_by(key='nmap_scan_args').first().value or self.nmap_scan_args
+            self.resolver.nameservers = [Setting.query.filter_by(key='nameserver').first().value,
+                                         '8.8.8.8'] or self.resolver.nameservers
+
+    def __update__(self):
+        while not self.stop_event.is_set():
+            try:
+                self.update()
+            except Exception as e:
+                print(f"Error updating settings: {e}", file=stderr)
+            finally:
+                sleep(3)
+
+    def __post_init__(self):
+        threading.Thread(target=self.__update__, daemon=True).start()
 
 
 env = Env()

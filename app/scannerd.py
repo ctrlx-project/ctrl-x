@@ -30,6 +30,7 @@ app = create_app()
 celery_app = app.extensions["celery"]
 celery_app.set_default()
 
+env.app = app
 
 @shared_task(ignore_result=False, name='scannerd.test')
 def test_scannerd(message):
