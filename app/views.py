@@ -17,6 +17,11 @@ def show_scans():
 
 @index.route('/reports/<id>')
 def show_report(id):
+    """
+    Renders a webpage that displays the report with the specified id.
+    args:
+        id: The id field of the report in the database
+    """
     report = Report.query.filter_by(id=id).first()
     if not report:
         return abort(404)
@@ -28,8 +33,8 @@ def show_report(id):
 
 @index.route("/reports")
 def list_reports():
-    user = 0
-    reports = Report.query.filter_by(user=user).all()
+    # Renders a webpage with a list of reports
+    reports = Report.query.all()
     ret = []
     if reports:
             ret = [(report.id, report.ip, report.time.strftime("%Y-%M-%D"), report.time.strftime("%H:%M:%S")) for report in reports]
