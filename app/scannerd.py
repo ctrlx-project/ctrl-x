@@ -32,7 +32,8 @@ celery_app.set_default()
 
 env.app = app
 
-@shared_task(ignore_result=False, name='scannerd.test')
+
+@shared_task(ignore_result=False, name='scannerd_test')
 def test_scannerd(message):
     return "Pong" if message == "Ping" else "Failed"
 
