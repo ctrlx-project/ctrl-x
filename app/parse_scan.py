@@ -39,7 +39,9 @@ def get_CVE(string:str)->list:
         result.add(string[index:finalIndex])
         string = string[finalIndex:]
         index = string.find("CVE")
-    return list(result)
+    result = list(result)
+    result.sort()
+    return result
 
 
 def parse_scan(scanResult:dict)->dict:
@@ -108,14 +110,21 @@ def parse_scan(scanResult:dict)->dict:
     return result
 
 
-def parse_from_JSON(file):
-    dict = loadJSON(file)
-    result = parse_scan(dict)
-    return result
+def parse_from_json(file):
+    """ Parse a single JSON scan file and extract useful informations.
+
+    Args:
+        (str): The path of the scan file.
+
+    Returns:
+        (dict): Parsed scan with useful information for metasploits.
+    """
+    dictionary = loadJSON(file)
+    return parse_scan(dictionary)
 
 if __name__ == "__main__":
     if len(argv) < 2:
         print("Usage: py parse_scan.py <file>; e.g. py scan.py seed/10.1.0.1.json")
         exit(1)
-    result = parse_from_JSON(argv[1])
+    result = parse_from_json(argv[1])
     print(result)
