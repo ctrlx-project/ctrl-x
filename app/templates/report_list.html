@@ -17,11 +17,13 @@ Report
           <tbody>
             {% for name in report_names%}
                 <tr>
-                    <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/reports/{{name[0]}}">
-                    <td>{{name[1]}}</td>
+                    <td>
+                        <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/reports/{{name[0]}}">
+                            {{name[1]}}
+                        </a>
+                    </td>
                     <td>{{name[2]}}</td>
                     <td>{{name[3]}}</td>
-                    </a>
                 </tr>
             {% endfor %}
           </tbody>
