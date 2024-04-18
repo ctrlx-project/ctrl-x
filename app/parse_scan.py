@@ -126,3 +126,6 @@ if __name__ == "__main__":
         exit(1)
     result = parse_from_json(argv[1])
     print(result)
+    f = open("parsed/test.json", "w")
+    json.dump(result, f , indent=6)
+    

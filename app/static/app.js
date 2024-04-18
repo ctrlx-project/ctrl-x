@@ -3,24 +3,15 @@ window.addEventListener("load", main);
 
 function main() {
 
-    $.ajax({
-        url: "/api/getscans",
-        type: "GET",
-        success: (scan) => {
-            scan.forEach((scan) => {
-                populateCard(scan);
-            });
-        }
-    });
+    const testurl= 'http://127.0.0.1:5000/api/scan?ip=10.1.0.1%2F24';
 
     $.ajax({
-        url: "/api/getscans",
-        type: "POST",
-        data:{
-            ip: "10.10.0.1/24"
-        },
+        url: testurl,
+        type: "GET",
         success: (scan1) => {
-            populateCard(scan1)
+            scan1.forEach(scan => {
+                populateCard(scan)
+            });
         }
     })
 
