@@ -30,13 +30,13 @@ class Env:
 
     stop_event = threading.Event()
 
-    def update(self):
+    def update(self):  # Updates setting values from the database
         with self.app.app_context():
             self.nmap_scan_args = Setting.query.filter_by(key='nmap_scan_args').first().value or self.nmap_scan_args
             self.resolver.nameservers = [Setting.query.filter_by(key='nameserver').first().value,
                                          '8.8.8.8'] or self.resolver.nameservers
 
-    def __update__(self):
+    def __update__(self):  # Update settings from the database every 3 seconds
         while not self.stop_event.is_set():
             try:
                 self.update()
@@ -45,7 +45,7 @@ class Env:
             finally:
                 sleep(3)
 
-    def __post_init__(self):
+    def __post_init__(self):  # Start the update thread after class initialization
         threading.Thread(target=self.__update__, daemon=True).start()
 
 

@@ -15,6 +15,7 @@ def _api():
 
 @api.route('/test-scan')
 def test_mq():
+    # Test scannerd by sending message to it, and then checking the reply
     result = test_scannerd.delay("Ping")
     sleep(1)
     result = AsyncResult(result.id)
@@ -29,6 +30,7 @@ def test_mq():
 
 @api.route('/scan-new', methods=['POST'])
 def _scan_():
+    # Dispatch scan using block/FQDN. This passes the job to scannerd
     ip_block = request.form.get('ip_block')
     if not ip_block:
         return error_resp('IP/IP block/FQDN is required')
