@@ -32,7 +32,7 @@ app:
 .PHONY: scannerd
 scannerd:
 	@echo "### Starting scannerd"
-	sudo -E ./venv/bin/python3 scannerd.py
+	sudo -E ./venv/bin/python3 -m celery -A scannerd.celery_app worker --loglevel INFO
 
 .PHONY: seed
 seed: venv

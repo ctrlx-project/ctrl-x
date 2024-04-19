@@ -1,7 +1,5 @@
 import json
 from sys import argv
-from typing import Any
-
 
 def loadJSON(file_path: str) -> dict | list:
     """Loads the file located at the given path.
@@ -19,14 +17,14 @@ def loadJSON(file_path: str) -> dict | list:
         print(f"File {file_path} does not exist")
         exit(1)
 
-def get_CVE(string:str)->set:
+def get_CVE(string:str)->list:
     """Parses a given string and returns a list of all CVEs included on it.
 
     Args:
         (dict): Dictionary output from the Nmap scan
 
     Returns:
-        (dict): Parsed scan with useful information for metasploit
+        (list): List of CVE's found.
     """
     index = string.find("CVE")
     result = set()
@@ -38,7 +36,9 @@ def get_CVE(string:str)->set:
                 break
         result.add(string[index:finalIndex])
         string = string[finalIndex:]
-        index = string.find("CVE") 
+        index = string.find("CVE")
+    result = list(result)
+    result.sort()
     return result
 
 
@@ -104,18 +104,28 @@ def parse_scan(scanResult:dict)->dict:
                             result[network]["ports"][port]["service"] = service
                         vulner = port_result.get("script",{}).get("vulners")
                         if vulner and type(vulner) == str:
-                            result[network]["ports"][port]["vulner"] = list(get_CVE(vulner))     
+                            result[network]["ports"][port]["vulner"] = get_CVE(vulner)
     return result
 
 
-def parse_from_JSON(file):
-    dict = loadJSON(file)
-    result = parse_scan(dict)
-    return result
+def parse_from_json(file):
+    """ Parse a single JSON scan file and extract useful informations.
+
+    Args:
+        (str): The path of the scan file.
+
+    Returns:
+        (dict): Parsed scan with useful information for metasploits.
+    """
+    dictionary = loadJSON(file)
+    return parse_scan(dictionary)
 
 if __name__ == "__main__":
     if len(argv) < 2:
         print("Usage: py parse_scan.py <file>; e.g. py scan.py seed/10.1.0.1.json")
         exit(1)
-    result = parse_from_JSON(argv[1])
+    result = parse_from_json(argv[1])
     print(result)
+    f = open("parsed/test.json", "w")
+    json.dump(result, f , indent=6)
+    

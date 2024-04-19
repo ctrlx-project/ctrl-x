@@ -7,9 +7,9 @@ class Scan(db.Model):
     __tablename__ = 'scans'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(16), nullable=False)
-    scan_data = db.Column(db.JSON, nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
-    end_time = db.Column(db.DateTime, nullable=False)
+    scan_data = db.Column(db.JSON, server_default='{}')
+    start_time = db.Column(db.DateTime, server_default=db.func.now())
+    end_time = db.Column(db.DateTime)
     status = db.Column(db.String(15))
 
     @property
@@ -31,6 +31,7 @@ class RawMeta(db.Model):
     start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(15))
+
 
 class ParsedMeta(db.Model):
     __tablename__ = 'parsed-meta'
