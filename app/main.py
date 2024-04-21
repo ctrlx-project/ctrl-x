@@ -1,5 +1,5 @@
 from api import api
-from views import index
+from views import index, auth
 from app import create_app
 
 app = create_app()
