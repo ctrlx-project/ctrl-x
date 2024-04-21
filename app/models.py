@@ -62,7 +62,7 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True)
-    password = db.Column(db.String(20))
+    password = db.Column(db.String(128))
 
     def info(self):
         return {
