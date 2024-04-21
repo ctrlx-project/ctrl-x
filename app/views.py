@@ -33,13 +33,13 @@ def auth():
 
     # For logging in
     elif request.method == 'POST':
-        netid = request.form.get('netid')
+        netid = request.form.get('username')
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
         user = User.query.filter_by(netid=netid).first()
         if user and check_password_hash(user.password, password):
             login_user(user, remember=remember)
-        return redirect(url_for('underground.underground_home'))
+        return redirect(url_for('index.home'))
 
     # For changing password
     elif request.method == 'PATCH':
