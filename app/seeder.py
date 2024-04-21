@@ -1,4 +1,4 @@
-from models import db, Scan, Setting, ExploitMeta, Parsed
+from models import db, Scan, Setting, Exploit, Parsed
 from pathlib import Path
 from datetime import datetime
 import json
@@ -39,7 +39,7 @@ for file in os.listdir(directory):
     data = json.load(f)
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(ExploitMeta(scan_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
+    scans.append(Exploit(scan_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
     f.close()
 
 with app.app_context():

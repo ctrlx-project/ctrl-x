@@ -23,7 +23,7 @@ class Scan(db.Model):
             'status':self.status,
         }
 
-class ExploitMeta(db.Model):
+class Exploit(db.Model):
     __tablename__ = 'exploits'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(16), nullable=False)
