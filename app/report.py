@@ -4,6 +4,7 @@ import time
 import requests
 import json
 from models import db, Exploit, Report
+from celery import shared_task
 
 accessToken = "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"
 
@@ -193,7 +194,8 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
                # return report
      return "".join(report)
 
-
+@shared_task(ignore_result=True, name='report', autoretry_for=(Exception,), retry_backoff=True,
+             retry_jitter=True, retry_kwargs={'max_retries': 3})
 def report_job(id:int, user:int, ip:str):
      # Takes a report job and save the result into the database.
      exploit = Exploit.query.filter_by(id=id).first()
