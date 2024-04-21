@@ -69,7 +69,7 @@ for file in os.listdir(directory):
     data = f.read()
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(Report(content=data, ip=ip+'/24', time=datetime.now(), user=1))
+    scans.append(Report(content=data, ip=ip+'/24', time=datetime.now(), user=user1))
     f.close()
 
 with app.app_context():
