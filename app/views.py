@@ -47,7 +47,7 @@ def auth():
             old_password = request.form.get('old_password')
             password = request.form.get('new_password')
             if check_password_hash(current_user.password, old_password):
-                user = User.query.filter_by(netid=current_user.netid).first()
+                user = User.query.filter_by(username=current_user.username).first()
                 user.password = generate_password_hash(password, method='pbkdf2:sha256')
                 db.session.add(user)
                 db.session.commit()
