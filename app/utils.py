@@ -71,3 +71,4 @@ def load_json(file_path: str) -> dict | list:
     except FileNotFoundError:
         print(f"File {file_path} does not exist")
         exit(1)
+        
