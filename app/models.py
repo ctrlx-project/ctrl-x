@@ -23,8 +23,8 @@ class Scan(db.Model):
             'status':self.status,
         }
 
-class RawMeta(db.Model):
-    __tablename__ = 'raw-meta'
+class ExploitMeta(db.Model):
+    __tablename__ = 'exploits'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(16), nullable=False)
     scan_data = db.Column(db.JSON, nullable=False)
@@ -33,8 +33,8 @@ class RawMeta(db.Model):
     status = db.Column(db.String(15))
 
 
-class ParsedMeta(db.Model):
-    __tablename__ = 'parsed-meta'
+class Parsed(db.Model):
+    __tablename__ = 'parsed'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(16), nullable=False)
     scan_data = db.Column(db.JSON, nullable=False)
