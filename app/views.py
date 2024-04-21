@@ -61,7 +61,7 @@ def auth():
         return success_resp('Logged out')
 
 
-@index.route('/auth/logout')
+@index.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('underground.underground_home'))
