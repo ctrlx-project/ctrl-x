@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Report
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+              <th scope="col">Network scanned</th>
+              <th scope="col">Date</th>
+              <th scope="col">Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for name in report_names%}
+                <tr>
+                    <td>
+                        <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/reports/{{name[0]}}">
+                            {{name[1]}}
+                        </a>
+                    </td>
+                    <td>{{name[2]}}</td>
+                    <td>{{name[3]}}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block imports %}
+
+{% endblock %}

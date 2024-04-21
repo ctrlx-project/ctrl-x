@@ -43,7 +43,6 @@ class ParsedMeta(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(15))
 
-
 class Setting(db.Model):
     __tablename__ = 'settings'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -58,6 +57,7 @@ class Setting(db.Model):
             'value': self.value
         }
 
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -69,3 +69,13 @@ class User(UserMixin, db.Model):
             'id': self.id,
             'netid': self.username,
         }
+
+class Report(db.Model):
+    __tablename__ = 'report'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL', onupdate='CASCADE'))
+    ip = db.Column(db.String(16), nullable=False)
+    time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+    content = db.Column(db.String())
+    user = db.relationship('User', backref=db.backref('report', lazy=True))
+
