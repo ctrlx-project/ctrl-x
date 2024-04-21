@@ -68,3 +68,8 @@ def auth():
 def logout():
     logout_user()
     return redirect(url_for('index.home'))
+
+@index.route("/register", methods=['GET', 'POST'])
+def register():
+    if request.method == "GET":
+        return render_template("register.html")

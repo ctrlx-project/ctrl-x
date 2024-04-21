@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block imports %}
+<script type="text/javascript" src="{{ url_for('static', filename='registerValidate.js') }}"></script>
+{% endblock %}
+
+{% block body %}    
+    <div class="container-xxl">
+      <h2 class="text-center">Register a new account </h2>
+      <div class="container">
+        <form action="register.html" method="POST" class="needs-validation" id="registerForm" novalidate>
+          <div class="row mb-3">
+            <div class="col-0 col-md-4"></div>
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="text" class="form-control registerInput" id="regUsername" name="username" placeholder="Username" autocomplete="on" required>
+                <label for="regUsername">Username</label>
+                <div class="invalid-feedback">
+                  Please enter a username.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-0 col-md-4"></div>
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="password" class="form-control registerInput" id="regPassword" name="password" 
+                placeholder="Password" pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,}" required>
+                <label for="regPassword">Password</label>
+                <div class="invalid-feedback feedback">
+                  <p id="length">At least 8 characters</p>
+                  <p id="letter">Contain at least one letter</p>
+                  <p id="number">Contain at least one number</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-0 col-md-4"></div>
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="password" class="form-control registerInput" id="regPassword2" name="password2" placeholder="Repeat Password" required>
+                <label for="regPassword2">Repeat Password</label>
+                <div class="invalid-feedback">
+                  Passwords do not match
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-0 col-md-4">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-outline-success w-100" type="submit">Register</button>
+            </div>
+          </div>
+          {% if registerError %}
+          <div class="row mb-3">
+            <div class="col-0 col-md-4">
+            </div>
+            <div class="col-md-4">
+              <div class='text-center alert alert-danger'>
+                {{registerError}}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+{% endblock %}
