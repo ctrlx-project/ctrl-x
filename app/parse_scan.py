@@ -4,7 +4,7 @@ from sys import argv
 
 from utils import load_json
 
-from models import db, Parsed
+from models import db, Parsed, Scan
 
 from datetime import datetime
 
@@ -118,11 +118,11 @@ def parse_from_json(file):
 def parse_scan_job(scan_id: str):
     if scan_id:
         # Gets the Scan from the database
-        saved_scan = Parsed.filter_by(id=scan_id)
+        saved_scan = Scan.filter_by(id=scan_id)
 
         # Creates the Parsed object in the database
         loaded_scan = json.loads(saved_scan.scan_data)
-        ip = next(iter(loaded_scan))
+        ip = next(iter(loaded_scan["scan"]))
         start_time = datetime.now()
         parsed_scan = Parsed(ip=ip, start_time=start_time, status='running')
         db.session.add(parsed_scan)
