@@ -3,7 +3,9 @@
 {% block title %}Login{% endblock %}
 
 {% block imports %}
-<script type="text/javascript" src="{{ url_for('static', filename='registerValidate.js') }}"></script>
+<link href="{{ url_for('static', filename='register.css') }}" 
+rel="stylesheet" 
+>
 {% endblock %}
 
 {% block body %}    
@@ -71,4 +73,5 @@
         </form>
       </div>
     </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='registerValidate.js') }}"></script>
 {% endblock %}
