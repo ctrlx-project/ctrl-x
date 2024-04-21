@@ -28,15 +28,15 @@ def auth():
     # For getting user info
     if request.method == 'GET':
         if current_user.is_authenticated:
-            return {'netid': current_user.netid, 'name': current_user.name, 'type': current_user.type}
-        return jsonify({'netid': None, 'name': None, 'type': None})
+            return {'Username': current_user.username}
+        return jsonify({'username': None})
 
     # For logging in
     elif request.method == 'POST':
-        netid = request.form.get('username')
+        username = request.form.get('username')
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
-        user = User.query.filter_by(netid=netid).first()
+        user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user, remember=remember)
         return redirect(url_for('index.home'))
