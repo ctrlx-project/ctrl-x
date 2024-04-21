@@ -2,18 +2,11 @@
 
 
 {% block title %}Underground{% endblock %}
+
+{% block body %}
 {% if login %}
-
-    {% block body %}
     <h1>Logged In</h1>
-    {% endblock %}
-
 {% else %}
-
-    {% block body %}
-        {% include "components/login-modal.html" %}
-
-    
-    {% endblock %}
-
+    {% include "components/login-modal.html" %}
 {% endif %}
+{% endblock %}
