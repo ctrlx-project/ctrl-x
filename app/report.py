@@ -201,7 +201,7 @@ def report_job(id:int, user:int, ip:str):
      exploit = Exploit.query.filter_by(id=id).first()
      exploit_data = json.loads(exploit.exploit_data)
      report = generateReport(exploit_data)
-     newReport = Report(user=user, ip=ip, content=report)
+     newReport = Report(user_id=user, ip=ip, content=report)
      db.session.add(newReport)
      db.session.commit()
 

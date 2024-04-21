@@ -73,7 +73,7 @@ class User(UserMixin, db.Model):
 class Report(db.Model):
     __tablename__ = 'report'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL', onupdate='CASCADE'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL', onupdate='CASCADE'))
     ip = db.Column(db.String(16), nullable=False)
     time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     content = db.Column(db.String())
