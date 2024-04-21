@@ -1,8 +1,10 @@
-import json
+from celery import shared_task
 
 from sys import argv
 
 from utils import load_json
+
+from models import db, Scan
 
 def get_cve(string:str)->list:
     """Parses a given string and returns a list of all CVEs included on it.
@@ -107,12 +109,19 @@ def parse_from_json(file):
     dictionary = load_json(file)
     return parse_scan(dictionary)
 
+@shared_task(ignore_result=True, name='parse_scan', autoretry_for=(Exception,), retry_backoff=True,
+             retry_jitter=True, retry_kwargs={'max_retries': 3})
+def parse_scan_job(scan_id: str):
+    if scan_id:
+        result = parse_from_json(argv[1])
+        print(result)
+
+def main():
+    result = parse_from_json(argv[1])
+    print(result)
+
 if __name__ == "__main__":
     if len(argv) < 2:
         print("Usage: py parse_scan.py <file>; e.g. py scan.py seed/10.1.0.1.json")
         exit(1)
-    result = parse_from_json(argv[1])
-    print(result)
-    f = open("parsed/test.json", "w")
-    json.dump(result, f , indent=6)
-    
+    main()
