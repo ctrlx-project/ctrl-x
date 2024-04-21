@@ -1,23 +1,16 @@
-import json
+from celery import shared_task
+
 from sys import argv
 
-def loadJSON(file_path: str) -> dict | list:
-    """Loads the file located at the given path.
+from utils import load_json
 
-    Args:
-        (str): Path of the file to be loaded
+from models import db, Parsed, Scan
 
-    Returns:
-        (dict | list): Object with contents of the loaded JSON file
-    """
-    try:
-        with open(file_path, "r") as json_file: 
-            return json.load(json_file)
-    except FileNotFoundError:
-        print(f"File {file_path} does not exist")
-        exit(1)
+from datetime import datetime
 
-def get_CVE(string:str)->list:
+import json
+
+def get_cve(string:str)->list:
     """Parses a given string and returns a list of all CVEs included on it.
 
     Args:
@@ -29,20 +22,20 @@ def get_CVE(string:str)->list:
     index = string.find("CVE")
     result = set()
     while index != -1:
-        finalIndex = -1
+        final_index = -1
         for i in range(index, len(string)):
             if string[i] == "\n" or string[i] == "\t":
-                finalIndex = i
+                final_index = i
                 break
-        result.add(string[index:finalIndex])
-        string = string[finalIndex:]
+        result.add(string[index:final_index])
+        string = string[final_index:]
         index = string.find("CVE")
     result = list(result)
     result.sort()
     return result
 
 
-def parse_scan(scanResult:dict)->dict:
+def parse_scan(scan_result:dict)->dict:
     """ Parse a single scan dictionary and extract useful informations.
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
@@ -68,7 +61,7 @@ def parse_scan(scanResult:dict)->dict:
         }}
     """
     result = {}
-    scan = scanResult.get("scan")
+    scan = scan_result.get("scan")
     if scan is None:
         return {}
     if (len(scan.keys()) < 1):
@@ -103,8 +96,8 @@ def parse_scan(scanResult:dict)->dict:
                             service = f'{product} {version}'.strip()
                             result[network]["ports"][port]["service"] = service
                         vulner = port_result.get("script",{}).get("vulners")
-                        if vulner and type(vulner) == str:
-                            result[network]["ports"][port]["vulner"] = get_CVE(vulner)
+                        if vulner and isinstance(vulner,str):
+                            result[network]["ports"][port]["vulner"] = get_cve(vulner)
     return result
 
 
@@ -117,15 +110,40 @@ def parse_from_json(file):
     Returns:
         (dict): Parsed scan with useful information for metasploits.
     """
-    dictionary = loadJSON(file)
+    dictionary = load_json(file)
     return parse_scan(dictionary)
+
+@shared_task(ignore_result=True, name='parse_scan', autoretry_for=(Exception,), retry_backoff=True,
+             retry_jitter=True, retry_kwargs={'max_retries': 3})
+def parse_scan_job(scan_id: str):
+    if scan_id:
+        # Gets the Scan from the database
+        saved_scan = Scan.filter_by(id=scan_id).first()
+
+        # Creates the Parsed object in the database
+        loaded_scan = json.loads(saved_scan.scan_data)
+        ip = next(iter(loaded_scan["scan"]))
+        start_time = datetime.now()
+        parsed_scan = Parsed(ip=ip, start_time=start_time, status='running')
+        db.session.add(parsed_scan)
+        db.session.commit()
+
+        # Runs parser
+        parsing_result = parse_scan(loaded_scan)
+
+        # Updates the Parsed object in the database
+        parsed_scan.parsed_data = parsing_result
+        parsed_scan.status = 'complete'
+        parsed_scan.end_time = datetime.now()
+        db.session.add(parsed_scan)
+        db.session.commit()
+
+def main():
+    result = parse_from_json(argv[1])
+    print(result)
 
 if __name__ == "__main__":
     if len(argv) < 2:
         print("Usage: py parse_scan.py <file>; e.g. py scan.py seed/10.1.0.1.json")
         exit(1)
-    result = parse_from_json(argv[1])
-    print(result)
-    f = open("parsed/test.json", "w")
-    json.dump(result, f , indent=6)
-    
+    main()

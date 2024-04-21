@@ -1,5 +1,6 @@
 from ipaddress import IPv4Network, AddressValueError
 from dns import resolver
+import json
 from app import env
 
 
@@ -56,3 +57,18 @@ def resolve_ip_block(ip_block: str) -> list | None:
         return [str(ip) for ip in IPv4Network(ip_block)]
     except ValueError:
         return None
+
+def load_json(file_path: str) -> dict | list:
+    """Loads the file located at the given path.
+    Args:
+        (str): Path of the file to be loaded
+    Returns:
+        (dict | list): Object with contents of the loaded JSON file
+    """
+    try:
+        with open(file_path, "r") as json_file:
+            return json.load(json_file)
+    except FileNotFoundError:
+        print(f"File {file_path} does not exist")
+        exit(1)
+        

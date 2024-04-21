@@ -24,21 +24,21 @@ class Scan(db.Model):
             'status':self.status,
         }
 
-class RawMeta(db.Model):
-    __tablename__ = 'raw-meta'
+class Exploit(db.Model):
+    __tablename__ = 'exploits'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(16), nullable=False)
-    scan_data = db.Column(db.JSON, nullable=False)
+    exploit_data = db.Column(db.JSON, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(15))
 
 
-class ParsedMeta(db.Model):
-    __tablename__ = 'parsed-meta'
+class Parsed(db.Model):
+    __tablename__ = 'parsed'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(16), nullable=False)
-    scan_data = db.Column(db.JSON, nullable=False)
+    parsed_data = db.Column(db.JSON, nullable=False)
     start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     end_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(15))

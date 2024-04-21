@@ -8,7 +8,7 @@ from celery import shared_task
 
 accessToken = "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"
 
-def loadJSON(filepath:str)->dict:
+def load_json(filepath:str)->dict:
     # Load JSON file into a dictionary
     try:
         f = open(filepath, "r")
@@ -207,7 +207,7 @@ def report_job(id:int, user:int, ip:str):
 
 
 def main():
-     exploit = loadJSON("./seed/exploit/metasploitable.json")
+     exploit = load_json("./seed/exploit/metasploitable.json")
      pretrained = "google/gemma-2b-it"
      tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
      model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=accessToken)
