@@ -8,5 +8,7 @@ transformers
 dnspython
 Flask-Migrate~=4.0.5
 gunicorn
-markdown
 celery
+flask_login
+werkzeug
+markdown
