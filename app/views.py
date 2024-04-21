@@ -5,7 +5,6 @@ from models import db, User
 from utils import error_resp, success_resp
 
 index = Blueprint('index', __name__, static_folder='static', template_folder='templates')
-auth = Blueprint('underground', __name__, static_folder='static', template_folder='templates')
 
 
 @index.route('/')
@@ -16,8 +15,8 @@ def home():
 def show_scans():
     return render_template('general_scans.html')
 
-@auth.route('/auth', methods=['GET', 'POST', 'PATCH', 'DELETE'])
-def underground_auth():
+@index.route('/auth', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+def auth():
     # For getting user info
     if request.method == 'GET':
         if current_user.is_authenticated:
@@ -54,7 +53,7 @@ def underground_auth():
         return success_resp('Logged out')
 
 
-@auth.route('/auth/logout')
-def underground_logout():
+@index.route('/auth/logout')
+def logout():
     logout_user()
     return redirect(url_for('underground.underground_home'))
