@@ -98,3 +98,4 @@ def register():
         # with app.app_context():
         db.session.add(newUser)
         db.session.commit()
+        return redirect(url_for('index.home')) 
