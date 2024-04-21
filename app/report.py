@@ -3,6 +3,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import time
 import requests
 import json
+from models import db, Exploit, Report
 
 accessToken = "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"
 
@@ -191,6 +192,16 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
                print(f"Port {port} completed")
                # return report
      return "".join(report)
+
+
+def report_job(id:int, user:int, ip:str):
+     # Takes a report job and save the result into the database.
+     exploit = Exploit.query.filter_by(id=id).first()
+     exploit_data = json.loads(exploit.scan_data)
+     report = generateReport(exploit_data)
+     newReport = Report(user=user, ip=ip, content=report)
+     db.session.add(newReport)
+     db.session.commit()
 
 
 def main():
