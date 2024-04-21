@@ -9,3 +9,4 @@ dnspython
 Flask-Migrate~=4.0.5
 gunicorn
 celery
+flask_login
