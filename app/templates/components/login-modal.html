@@ -6,15 +6,15 @@
                 <h5 class="modal-title" id="staticBackdropLabel">Login</h5>
             </div>
             <div class="modal-body">
-                <form method="POST" action="/underground/auth">
+                <form method="POST" action="/auth">
                     <!-- Netid input -->
                     <div class="mb-4 form-floating">
-                        <input name="netid" type="text" id="netid" class="form-control"/>
-                        <label class="form-label" for="netid">NetID</label>
+                        <input name="netid" type="text" id="netid" class="form-control" placeholder="Username"/>
+                        <label class="form-label" for="netid">Username</label>
                     </div>
                     <!-- Password input -->
                     <div class="mb-4 form-floating">
-                        <input name="password" type="password" id="password" class="form-control"/>
+                        <input name="password" type="password" id="password" class="form-control" placeholder="Password"/>
                         <label class="form-label" for="password">Password</label>
                     </div>
                     <!-- Remember me -->
