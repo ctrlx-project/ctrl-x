@@ -1,23 +1,10 @@
 import json
+
 from sys import argv
 
-def loadJSON(file_path: str) -> dict | list:
-    """Loads the file located at the given path.
+from utils import load_json
 
-    Args:
-        (str): Path of the file to be loaded
-
-    Returns:
-        (dict | list): Object with contents of the loaded JSON file
-    """
-    try:
-        with open(file_path, "r") as json_file: 
-            return json.load(json_file)
-    except FileNotFoundError:
-        print(f"File {file_path} does not exist")
-        exit(1)
-
-def get_CVE(string:str)->list:
+def get_cve(string:str)->list:
     """Parses a given string and returns a list of all CVEs included on it.
 
     Args:
@@ -29,20 +16,20 @@ def get_CVE(string:str)->list:
     index = string.find("CVE")
     result = set()
     while index != -1:
-        finalIndex = -1
+        final_index = -1
         for i in range(index, len(string)):
             if string[i] == "\n" or string[i] == "\t":
-                finalIndex = i
+                final_index = i
                 break
-        result.add(string[index:finalIndex])
-        string = string[finalIndex:]
+        result.add(string[index:final_index])
+        string = string[final_index:]
         index = string.find("CVE")
     result = list(result)
     result.sort()
     return result
 
 
-def parse_scan(scanResult:dict)->dict:
+def parse_scan(scan_result:dict)->dict:
     """ Parse a single scan dictionary and extract useful informations.
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
@@ -68,7 +55,7 @@ def parse_scan(scanResult:dict)->dict:
         }}
     """
     result = {}
-    scan = scanResult.get("scan")
+    scan = scan_result.get("scan")
     if scan is None:
         return {}
     if (len(scan.keys()) < 1):
@@ -103,8 +90,8 @@ def parse_scan(scanResult:dict)->dict:
                             service = f'{product} {version}'.strip()
                             result[network]["ports"][port]["service"] = service
                         vulner = port_result.get("script",{}).get("vulners")
-                        if vulner and type(vulner) == str:
-                            result[network]["ports"][port]["vulner"] = get_CVE(vulner)
+                        if vulner and isinstance(vulner,str):
+                            result[network]["ports"][port]["vulner"] = get_cve(vulner)
     return result
 
 
@@ -117,7 +104,7 @@ def parse_from_json(file):
     Returns:
         (dict): Parsed scan with useful information for metasploits.
     """
-    dictionary = loadJSON(file)
+    dictionary = load_json(file)
     return parse_scan(dictionary)
 
 if __name__ == "__main__":
