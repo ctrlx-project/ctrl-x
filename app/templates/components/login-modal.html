@@ -1,0 +1,41 @@
+<!-- Login -->
+<div class="modal fade" id="login" data-mdb-backdrop="static" data-mdb-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Login</h5>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="/auth">
+                    <!-- Netid input -->
+                    <div class="mb-4 form-floating">
+                        <input name="username" type="text" id="username" class="form-control" placeholder="Username"/>
+                        <label class="form-label" for="username">Username</label>
+                    </div>
+                    <!-- Password input -->
+                    <div class="mb-4 form-floating">
+                        <input name="password" type="password" id="password" class="form-control" placeholder="Password"/>
+                        <label class="form-label" for="password">Password</label>
+                    </div>
+                    <!-- Remember me -->
+                    <div class="row mb-4">
+                        <div class="col d-flex justify-content-center">
+                            <!-- Checkbox -->
+                            <div class="form-check">
+                                <input name="remember" class="form-check-input" type="checkbox" id="remember" checked/>
+                                <label class="form-check-label" for="remember">Remember me</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary btn-block w-100">Authenticate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(() => {
+        $("#login").modal('show');
+    });
+</script>

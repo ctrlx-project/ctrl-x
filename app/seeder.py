@@ -1,9 +1,10 @@
-from models import db, Scan, Setting, Exploit, Parsed, Report
+from models import db, Scan, Setting, Exploit, Parsed, Report, User
 
 from pathlib import Path
 from datetime import datetime
 import json
 import os
+from werkzeug.security import generate_password_hash
 
 from app import create_app
 
@@ -85,8 +86,6 @@ for file in os.listdir(directory):
     f.close()
 
 with app.app_context():
-    # db.drop_all()
-    # db.create_all()
     db.session.add_all(scans)
     db.session.commit()
 
@@ -102,4 +101,12 @@ for pref in settings_sample_data:
 
 with app.app_context():
     db.session.add_all(settings)
+    db.session.commit()
+
+user1 = User(
+    username='test',
+    password=generate_password_hash('test', "pbkdf2:sha256")
+    )
+with app.app_context():
+    db.session.add(user1)
     db.session.commit()
