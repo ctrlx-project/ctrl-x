@@ -16,9 +16,9 @@ def show_scans():
     return render_template('general_scans.html')
 
 @index.route('/login')
-def underground_home():
+def login():
     login = current_user.is_authenticated
-    return render_template('underground.html',
+    return render_template('login.html',
                            login=login,
                            name=current_user.username if login else None,
                            )
