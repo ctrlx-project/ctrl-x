@@ -15,6 +15,14 @@ def home():
 def show_scans():
     return render_template('general_scans.html')
 
+@index.route('/login')
+def underground_home():
+    login = current_user.is_authenticated
+    return render_template('underground.html',
+                           login=login,
+                           name=current_user.username if login else None,
+                           )
+
 @index.route('/auth', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 def auth():
     # For getting user info
