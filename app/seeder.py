@@ -39,7 +39,7 @@ for file in os.listdir(directory):
     data = json.load(f)
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(Exploit(scan_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
+    scans.append(Exploit(exploit_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
     f.close()
 
 with app.app_context():
@@ -60,7 +60,7 @@ for file in os.listdir(directory):
     data = json.load(f)
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(Parsed(scan_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
+    scans.append(Parsed(parsed_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
     f.close()
 
 with app.app_context():

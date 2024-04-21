@@ -4,7 +4,11 @@ from sys import argv
 
 from utils import load_json
 
-from models import db, Scan
+from models import db, Parsed
+
+from datetime import datetime
+
+import json
 
 def get_cve(string:str)->list:
     """Parses a given string and returns a list of all CVEs included on it.
@@ -113,8 +117,26 @@ def parse_from_json(file):
              retry_jitter=True, retry_kwargs={'max_retries': 3})
 def parse_scan_job(scan_id: str):
     if scan_id:
-        result = parse_from_json(argv[1])
-        print(result)
+        # Gets the Scan from the database
+        saved_scan = Parsed.filter_by(id=scan_id)
+
+        # Creates the Parsed object in the database
+        loaded_scan = json.loads(saved_scan.scan_data)
+        ip = next(iter(loaded_scan))
+        start_time = datetime.now()
+        parsed_scan = Parsed(ip=ip, start_time=start_time, status='running')
+        db.session.add(parsed_scan)
+        db.session.commit()
+
+        # Runs parser
+        parsing_result = parse_scan(loaded_scan)
+
+        # Updates the Parsed object in the database
+        parsed_scan.parsed_data = parsing_result
+        parsed_scan.status = 'complete'
+        parsed_scan.end_time = datetime.now()
+        db.session.add(parsed_scan)
+        db.session.commit()
 
 def main():
     result = parse_from_json(argv[1])
