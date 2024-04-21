@@ -33,7 +33,7 @@ def show_report(id):
 
 @index.route("/reports")
 def list_reports():
-    # Renders a webpage with a list of reports
+    """Renders a webpage with a list of reports"""
     reports = Report.query.all()
     ret = []
     if reports:
