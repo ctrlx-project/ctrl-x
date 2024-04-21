@@ -18,6 +18,8 @@ def show_scans():
 @index.route('/login')
 def login():
     login = current_user.is_authenticated
+    if login:
+        return redirect(url_for('index.home'))
     return render_template('login.html',
                            login=login,
                            name=current_user.username if login else None,
