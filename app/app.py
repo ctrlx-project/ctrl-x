@@ -11,7 +11,8 @@ from celery import Celery, Task
 
 from dns import resolver
 import threading
-from time import sleep, timedelta
+from time import sleep
+from datetime import timedelta
 
 
 @dataclass

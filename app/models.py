@@ -65,8 +65,6 @@ class User(UserMixin, db.Model):
     netid = db.Column(db.String(15), unique=True)
     password = db.Column(db.String(128))
     type = db.Column(db.String(10), nullable=False, default='user')
-    location_id = db.Column(db.Integer, db.ForeignKey('locations.id', ondelete='SET NULL', onupdate='CASCADE'))
-    location = db.relationship('Location', backref=db.backref('users', lazy=True))
 
     def info(self):
         return {
