@@ -61,15 +61,11 @@ class Setting(db.Model):
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    netid = db.Column(db.String(15), unique=True)
-    password = db.Column(db.String(128))
-    type = db.Column(db.String(10), nullable=False, default='user')
+    username = db.Column(db.String(20), unique=True)
+    password = db.Column(db.String(20))
 
     def info(self):
         return {
             'id': self.id,
-            'name': self.name,
-            'netid': self.netid,
-            'type': self.type,
+            'netid': self.username,
         }
