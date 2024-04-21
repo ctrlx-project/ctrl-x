@@ -39,8 +39,8 @@ def auth():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user, remember=remember)
-            return redirect(url_for('index.login'))
-        return redirect(url_for('index.home'))
+            return redirect(url_for('index.home'))
+        return redirect(url_for('index.login'))
 
     # For changing password
     elif request.method == 'PATCH':
