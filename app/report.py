@@ -3,10 +3,12 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import time
 import requests
 import json
+from models import db, Exploit, Report
+from celery import shared_task
 
 accessToken = "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"
 
-def loadJSON(filepath:str)->dict:
+def load_json(filepath:str)->dict:
     # Load JSON file into a dictionary
     try:
         f = open(filepath, "r")
@@ -192,9 +194,20 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
                # return report
      return "".join(report)
 
+@shared_task(ignore_result=True, name='report', autoretry_for=(Exception,), retry_backoff=True,
+             retry_jitter=True, retry_kwargs={'max_retries': 3})
+def report_job(id:int, user:int, ip:str):
+     # Takes a report job and save the result into the database.
+     exploit = Exploit.query.filter_by(id=id).first()
+     exploit_data = json.loads(exploit.exploit_data)
+     report = generateReport(exploit_data)
+     newReport = Report(user_id=user, ip=ip, content=report)
+     db.session.add(newReport)
+     db.session.commit()
+
 
 def main():
-     exploit = loadJSON("./seed/exploit/metasploitable.json")
+     exploit = load_json("./seed/exploit/metasploitable.json")
      pretrained = "google/gemma-2b-it"
      tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
      model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=accessToken)
