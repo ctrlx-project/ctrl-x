@@ -41,7 +41,7 @@ def _scan_():
         return error_resp('Invalid IP/FQDN')
 
       
-@api.route('/scan', methods=['GET','POST'])
+@api.route('/scan', methods=['GET'])
 def scans():
     # if GET method, return all scans in database
     if request.method == 'GET':
@@ -50,14 +50,15 @@ def scans():
             result = Scan.query.filter(Scan.ip==request_ip)
             if result:
                 ret = [scan.info for scan in result]
-                return jsonify(ret)
+                p_list = sorted(ret, key=lambda x: x['start_time'])
+                return jsonify(p_list)
             else:
                 return error_resp(f"Scans with ip {request_ip} not found.")
         else:
             result = Scan.query.all()
             if result:
                 ret = [scan.info for scan in result]
-                return jsonify(ret)
+                p_list = sorted(ret, key=lambda x: x['start_time'])
+                return jsonify(p_list)
             else:
                 return error_resp("No scans yet!")
-    # if POST method, return scans with matching IP's

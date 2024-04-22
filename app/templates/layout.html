@@ -16,7 +16,7 @@
     {% block imports %}
     {% endblock %}
 </head>
-<body>
+<body data-bs-theme="dark">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
           <a class="navbar-brand" href={{url_for('index.home')}}>CTRL-X</a>
@@ -47,9 +47,14 @@
           </div>
         </div>
     </nav>
-    <h1>{% block header %}{% endblock %}</h1>
-
-  {% block body %}{% endblock %}
+  <div class="d-flex justify-content-center">
+    <h1 style="padding-top:2em">
+      {% block header %}{% endblock %}
+    </h1>
+  </div>
+  <div class="d-flex flex-direction:column justify-content-evenly">
+    {% block body %}{% endblock %}
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 

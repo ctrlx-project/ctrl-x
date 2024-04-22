@@ -12,17 +12,14 @@ Welcome user!
 {% endblock %}
 
 {% block body %}
-<h1>Welcome to CTRL-X</h1>
-<a href="{{url_for('index.show_scans')}}" >
+<!-- <a href="{{url_for('index.show_scans')}}" >
     <button>Request Data</button>
-</a>
-<div class="offcanvas offcanvas-start show" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasLabel">Offcanvas</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      Content for the offcanvas goes here. You can place just about any Bootstrap component or custom elements here.
-    </div>
+</a> -->
+<div class="card text-center" style="width: 18rem; margin-top: 10em ">
+  <div class="card-body">
+    <h5 class="card-title">Scans</h5>
+    <p class="card-text" style="margin-top:2em">Here you can see historic and current scan jobs requested.</p>
+    <a href="{{url_for('index.show_scans')}}" class="btn btn-primary">Go to Data</a>
+  </div>
 </div>
 {% endblock %}
