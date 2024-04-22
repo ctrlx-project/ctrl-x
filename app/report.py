@@ -3,10 +3,19 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import time
 import requests
 import json
-from models import db, Exploit, Report
+from models import db, Exploit, Report, User
 from celery import shared_task
+from app import env, create_app
+from sys import stderr
 
-accessToken = "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"
+accessToken = env.ml_access_token
+
+app = create_app()
+celery_app = app.extensions["celery"]
+celery_app.set_default()
+
+env.app = app
+
 
 def loadJSON(filepath:str)->dict:
     # Load JSON file into a dictionary
@@ -194,16 +203,32 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
                # return report
      return "".join(report)
 
-@shared_task(ignore_result=True, name='report', autoretry_for=(Exception,), retry_backoff=True,
-             retry_jitter=True, retry_kwargs={'max_retries': 3})
-def report_job(id:int, user:int, ip:str):
+@shared_task(ignore_result=False, name='report', autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
+def report_job(id:int, user_id:int, ip:str) -> bool:
      # Takes a report job and save the result into the database.
-     exploit = Exploit.query.filter_by(id=id).first()
-     exploit_data = json.loads(exploit.exploit_data)
-     report = generateReport(exploit_data)
-     newReport = Report(user_id=user, ip=ip, content=report)
-     db.session.add(newReport)
-     db.session.commit()
+     # Return boolean based on whether the job is completed.
+     with app.app_context():
+          user = User.query.filter_by(id=user_id).first()
+          exploit = Exploit.query.filter_by(id=id).first()
+          exploit_data = json.loads(exploit.exploit_data)
+          newReport = Report(user_id=user, ip=ip, status="running")
+          db.session.add(newReport)
+          db.session.commit()
+     try:
+          report = generateReport(exploit_data)
+          with app.app_context():
+               newReport.status = "complete"
+               newReport.content = report
+               db.session.add(newReport)
+               db.session.commit()
+          return True
+     except Exception as e:
+          with app.app_context():
+               newReport.status = "failed"
+               db.session.add(newReport)
+               db.session.commit()
+          print(f"Error generating report for {ip}: {e}", file=stderr)
+          return False
 
 
 def main():

@@ -22,6 +22,7 @@ class Env:
     broker_url: str = environ.get("RABBITMQ_URL", default="amqp://admin:admin@localhost:5672")
     result_backend: str = environ.get("POSTGRES_URL", default="db+postgresql://admin:admin@localhost:5432/ctrl-x")
     secret_key:str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
+    ml_access_token:str = environ.get("ML_ACCESS_TOKEN", default="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")
 
     app = None
 
@@ -94,7 +95,7 @@ def create_app() -> Flask:
     celery_init(app)
 
     login_manager = LoginManager()
-    login_manager.login_view = "underground.underground_home"
+    login_manager.login_view = "index.login"
     login_manager.init_app(app)
 
     @login_manager.user_loader
