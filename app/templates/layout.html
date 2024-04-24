@@ -28,7 +28,7 @@
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="{{url_for('index.home')}}">Home</a>
               </li>
-              {% if login %}
+              {% if current_user.is_authenticated %}
               <li class="nav-item">
                 <a class="nav-link" href="{{url_for('index.logout')}}">Logout</a>
               </li>

@@ -12,11 +12,8 @@ index = Blueprint('index', __name__, static_folder='static', template_folder='te
 
 @index.route('/', methods=['GET','POST'])
 def home():
-    login = current_user.is_authenticated
-    username = current_user.get_id()
-    success = False
     if request.method == 'GET':
-        return render_template('home.html',login=login,username=username,success=success)
+        return render_template('home.html')
     # elif request.method == "POST":
     #     ip = request.form.get('ip')
 
@@ -24,7 +21,10 @@ def home():
 
 @index.route('/scans')
 def show_scans():
-    return render_template('general_scans.html')
+    if current_user.is_authenticated:
+        return render_template('general_scans.html')
+    else:
+        return error_resp('Must be logged in to see scans')
 
 @index.route('/login')
 def login():
