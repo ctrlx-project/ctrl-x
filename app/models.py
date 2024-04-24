@@ -77,5 +77,6 @@ class Report(db.Model):
     ip = db.Column(db.String(16), nullable=False)
     time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     content = db.Column(db.String())
+    status = db.Column(db.String(15))
     user = db.relationship('User', backref=db.backref('report', lazy=True))
 
