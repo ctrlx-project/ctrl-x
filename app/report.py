@@ -16,7 +16,6 @@ celery_app.set_default()
 
 env.app = app
 
-
 def load_json(filepath:str)->dict:
     # Load JSON file into a dictionary
      try:
