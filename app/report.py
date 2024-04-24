@@ -14,8 +14,6 @@ app = create_app()
 celery_app = app.extensions["celery"]
 celery_app.set_default()
 
-env.app = app
-
 pretrained = "google/gemma-2b-it"
 tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
 model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
