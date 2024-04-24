@@ -3,22 +3,31 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import time
 import requests
 import json
-from models import db, Exploit, Report
+from models import db, Exploit, Report, User
 from celery import shared_task
+from app import env, create_app
+from sys import stderr
 
-accessToken = "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"
+access_token = env.ml_access_token
+
+app = create_app()
+celery_app = app.extensions["celery"]
+celery_app.set_default()
+
+pretrained = "google/gemma-2b-it"
+tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
+model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
+
 
 def load_json(filepath:str)->dict:
     # Load JSON file into a dictionary
-    try:
-        f = open(filepath, "r")
-    except:
-        print("File does not exist")
-        exit(1)
-    dict = json.load(f)
-    return dict
+     try:
+          with open(filepath, 'r') as f:
+               return json.load(f)
+     except FileNotFoundError:
+          raise Exception("File not found")
 
-def getTable(vulner: dict)->str:
+def get_table(vulner: dict)->str:
      # Generate a markedown table for each vulnerability
      table = [f"\n| Exploit Name | {vulner.get('exploit')} |\n| --- | --- |\n"]
      if vulner.get("exploit_options"):
@@ -39,8 +48,7 @@ def getTable(vulner: dict)->str:
      table.append("\n")
      return "".join(table)
 
-
-def getDescription(exploits: dict) -> tuple[list, list, list]:
+def get_description(exploits: dict) -> tuple[list, list, list]:
      # Get the desciption from a dictionary that contain output from metasploit for a port
      # Can also get CVSS score if there is CVE number
      descriptions = []
@@ -49,7 +57,7 @@ def getDescription(exploits: dict) -> tuple[list, list, list]:
      remaining = len(exploits)
      for exploitName in exploits.keys():
           exploit = exploits.get(exploitName)
-          tables.append(getTable(exploit))
+          tables.append(get_table(exploit))
           cve = exploit.get("CVE")
           remaining -= 1
           if cve:
@@ -95,7 +103,7 @@ def getDescription(exploits: dict) -> tuple[list, list, list]:
                CVSS.append([None, None, None])
      return descriptions, CVSS, tables
 
-def descriptionToMD(descriptions:list, CVSS: list, tables: list) -> str:
+def description_to_MD(descriptions:list, CVSS: list, tables: list) -> str:
      text = []
      for i in range(len(descriptions)):
           text.append(f"{descriptions[i]}\n")
@@ -108,16 +116,16 @@ def descriptionToMD(descriptions:list, CVSS: list, tables: list) -> str:
           text.append(tables[i])
      return "".join(text)
 
-def generateSectionReport(sectionResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM)->str:
+def generate_section_report(sectionResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM)->str:
      """
      Create the markdown for all the exploited vulnerabilities in a port or all the vulnerabilities that are not exploited in a port
      sectionResult: dictionary containing the exploit result for this section
      tokenizer: tokenizer for the LLM
      model: LLM model
      """
-     descriptions, CVSS, tables = getDescription(sectionResult)
+     descriptions, CVSS, tables = get_description(sectionResult)
      # print(len(descriptions), len(CVSS), len(tables))
-     descriptionMD = descriptionToMD(descriptions, CVSS, tables)
+     descriptionMD = description_to_MD(descriptions, CVSS, tables)
 
      descriptionText = "\n".join(descriptions)
 
@@ -160,7 +168,7 @@ Generated text starts here:
      
      return combinedOutput
 
-def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM) -> str:
+def generate_report(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModelForCausalLM) -> str:
      """
      Create the markdown report
      exploitResult: dictionary containing the exploit result
@@ -184,34 +192,50 @@ def generateReport(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoModel
                          failed_exploits[exploit] = exploit_port[exploit]
                if len(shell_exploits) > 0:
                     report.append("### Vulnerabilities that we exploited to get a shell\n")
-                    report.append(generateSectionReport(shell_exploits, tokenizer, model))
+                    report.append(generate_section_report(shell_exploits, tokenizer, model))
                     report.append("\n")
                if len(failed_exploits) > 0:
                     report.append("### Vulnerabilities that we are unable to exploit\n")
-                    report.append(generateSectionReport(failed_exploits, tokenizer, model))
+                    report.append(generate_section_report(failed_exploits, tokenizer, model))
                     report.append("\n")
                print(f"Port {port} completed")
                # return report
      return "".join(report)
 
-@shared_task(ignore_result=True, name='report', autoretry_for=(Exception,), retry_backoff=True,
-             retry_jitter=True, retry_kwargs={'max_retries': 3})
-def report_job(id:int, user:int, ip:str):
+@shared_task(ignore_result=False, name='report', autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
+def report_job(id:int, user_id:int, ip:str) -> bool:
      # Takes a report job and save the result into the database.
-     exploit = Exploit.query.filter_by(id=id).first()
-     exploit_data = json.loads(exploit.exploit_data)
-     report = generateReport(exploit_data)
-     newReport = Report(user_id=user, ip=ip, content=report)
-     db.session.add(newReport)
-     db.session.commit()
+     # Return boolean based on whether the job is completed.
+     with app.app_context():
+          user = User.query.filter_by(id=user_id).first()
+          exploit = Exploit.query.filter_by(id=id).first()
+          exploit_data = json.loads(exploit.exploit_data)
+          newReport = Report(user_id=user, ip=ip, status="running")
+          db.session.add(newReport)
+          db.session.commit()
+     try:
+          report = generate_report(exploit_data, tokenizer, model)
+          with app.app_context():
+               newReport.status = "complete"
+               newReport.content = report
+               db.session.add(newReport)
+               db.session.commit()
+          return True
+     except Exception as e:
+          with app.app_context():
+               newReport.status = "failed"
+               db.session.add(newReport)
+               db.session.commit()
+          print(f"Error generating report for {ip}: {e}", file=stderr)
+          return False
 
 
 def main():
      exploit = load_json("./seed/exploit/metasploitable.json")
-     pretrained = "google/gemma-2b-it"
-     tokenizer = AutoTokenizer.from_pretrained(pretrained, token=accessToken)
-     model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=accessToken)
-     result = generateReport(exploit, tokenizer, model)
+     # pretrained = "google/gemma-2b-it"
+     # tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
+     # model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
+     result = generate_report(exploit, tokenizer, model)
      outputFile = open("mlOutput.md", "w")
      outputFile.write(result)
      outputFile.close()

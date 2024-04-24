@@ -1,4 +1,4 @@
-from report import load_json, getDescription, descriptionToMD
+from report import load_json, get_description, description_to_MD
 import os
 
 
@@ -7,7 +7,7 @@ def test_getDescription():
     directory = os.path.dirname(__file__)
     vulnerabilities = load_json(os.path.join(directory, "seed/test_report/test.json"))
     
-    descriptions, CVSS, table = getDescription(vulnerabilities)
+    descriptions, CVSS, table = get_description(vulnerabilities)
     target_table = """\n| Exploit Name | exploit/unix/ftp/vsftpd_234_backdoor |
 | --- | --- |
 | WfsDelay | 2 |
@@ -34,8 +34,8 @@ def test_report():
     # Test descriptionToMD from report.py
     directory = os.path.dirname(__file__)
     vulnerabilities = load_json(os.path.join(directory, "seed/test_report/test.json"))
-    descriptions, CVSS, table = getDescription(vulnerabilities)
-    markdown = descriptionToMD(descriptions, CVSS, table)
+    descriptions, CVSS, table = get_description(vulnerabilities)
+    markdown = description_to_MD(descriptions, CVSS, table)
     directory = os.path.dirname(__file__)
     markdownFile = open(os.path.join(directory, "seed/test_report/markdown.md"), "r")
     target_markdown = markdownFile.read()
