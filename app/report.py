@@ -17,7 +17,7 @@ celery_app.set_default()
 env.app = app
 
 
-def load_JSON(filepath:str)->dict:
+def load_json(filepath:str)->dict:
     # Load JSON file into a dictionary
      try:
           with open(filepath, 'r') as f:
@@ -230,7 +230,7 @@ def report_job(id:int, user_id:int, ip:str) -> bool:
 
 
 def main():
-     exploit = load_JSON("./seed/exploit/metasploitable.json")
+     exploit = load_json("./seed/exploit/metasploitable.json")
      pretrained = "google/gemma-2b-it"
      tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
      model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
