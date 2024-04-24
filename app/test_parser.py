@@ -17,13 +17,13 @@ with open(PARSED_SCAN_PATH, encoding="UTF-8") as json_parsed:
 
 def test_load_json():
     """Tests load_json function."""
-    loaded_json = parse_scan.loadJSON(SCAN_PATH)
+    loaded_json = parse_scan.load_json(SCAN_PATH)
     assert loaded_json == SCAN
 
 def test_get_cve():
     """Tests get_cve function."""
     expected_cves = PARSED_SCAN["10.10.0.14"]["ports"]["80"]["vulner"]
-    cves = parse_scan.get_CVE(SCAN["scan"]["10.10.0.14"]["tcp"]["80"]["script"]["vulners"])
+    cves = parse_scan.get_cve(SCAN["scan"]["10.10.0.14"]["tcp"]["80"]["script"]["vulners"])
     assert cves == expected_cves
 
 def test_parse_scan():

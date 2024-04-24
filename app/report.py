@@ -20,6 +20,7 @@ pretrained = "google/gemma-2b-it"
 tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
 model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
 
+
 def load_json(filepath:str)->dict:
     # Load JSON file into a dictionary
      try:
