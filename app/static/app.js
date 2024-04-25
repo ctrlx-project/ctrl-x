@@ -40,7 +40,7 @@ function main() {
       scan1.forEach((scan) => {
         let coressponding_report;
         report_list.forEach((report) => {
-          if (report.ip == scan.ip) {
+          if (report.scan_id == scan.id) {
             coressponding_report = report.id;
           }
         });
@@ -77,7 +77,7 @@ function main() {
               scan_data.ip
             }</a></td>` +
             `<td>${scan_data.start_time}</td>` +
-            `<td>${scan_data.end_time}</td>` +
+            `<td>-</td>` +
             `<td>${scan_data.status}</td>` +
             `</tr>`
         );
@@ -101,7 +101,7 @@ function main() {
             `<th scope="row">${count}</th>` +
             `<td>${scan_data.ip}</td>` +
             `<td>${scan_data.start_time}</td>` +
-            `<td>${scan_data.end_time}</td>` +
+            `<td>-</td>` +
             `<td>${scan_data.status}</td>` +
             `</tr>`
         );
