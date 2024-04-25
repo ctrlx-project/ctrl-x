@@ -1,0 +1,14 @@
+.homepage-card {
+    width: 18rem; 
+    margin-top: 2em;
+    border-radius: 20%;
+    border-width: 5px;
+}
+
+.card-text {
+    margin-top:2em;
+}
+
+.small-mt {
+    margin-top:1em;
+}

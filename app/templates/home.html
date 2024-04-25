@@ -20,35 +20,35 @@ Home
     <button>Request Data</button>
 </a> -->
 {% if current_user.is_authenticated %}
-<div class="card text-center" style="width: 18rem; margin-top: 2em ">
+<div class="card text-center homepage-card" >
   <div class="card-body">
     <h5 class="card-title">Scans</h5>
-    <p class="card-text" style="margin-top:2em">Here you can see historic and current scan jobs requested.</p>
+    <p class="card-text homepage-card-text">Here you can see historic and current scan jobs requested.</p>
     <a href="{{url_for('index.show_scans')}}" class="btn btn-primary">Go to Data</a>
   </div>
 </div>
-<div class="card text-center" style="width: 18rem; margin-top: 2em ">
+<div class="card text-center homepage-card">
   <div class="card-body">
     <h5 class="card-title">Reports</h5>
-    <p class="card-text" style="margin-top:2em">Here you can see reports of past scan.</p>
+    <p class="card-text homepage-card-text">Here you can see reports of past scan.</p>
     <a href="{{url_for('index.list_reports')}}" class="btn btn-primary">Go to Reports</a>
   </div>
 </div>
-<div class="card text-center" style="width: 18rem; margin-top: 2em ">
+<div class="card text-center homepage-card">
   <div class="card-body">
     <h5 class="card-title">Request New Job</h5>
-    <p class="card-text" style="margin-top:2em">Here you can request a new job after inputting a valid ip or ip subnet</p>
+    <p class="card-text homepage-card-text">Here you can request a new job after inputting a valid ip or ip subnet</p>
     <form action="{{url_for('api._scan_')}}" method="post">
       <label for="ip_block">IP:</label><br>
       <input type="text" id="ip_block" name="ip_block">
-      <input style="margin-top:1em"type="submit" value="Submit">
+      <input class="small-mt" type="submit" value="Submit">
     </form>
   </div>
 </div>
-<div class="card text-center" style="width: 18rem; margin-top: 2em ">
+<div class="card text-center homepage-card">
   <div class="card-body">
     <h5 class="card-title">Manage users</h5>
-    <p class="card-text" style="margin-top:2em">Here you can view users that have access to this portal and create new users.</p>
+    <p class="card-text homepage-card-text">Here you can view users that have access to this portal and create new users.</p>
     <a href="{{url_for('index.users')}}" class="btn btn-primary">View other users</a>
     <br>
     <br>
