@@ -79,11 +79,13 @@ def auth():
 
 @index.route('/logout')
 def logout():
+    # Allow the user to log out
     logout_user()
     return redirect(url_for('index.home'))
 
 @index.route("/register", methods=['GET', 'POST'])
 def register():
+    """Renders a webpage that allows user to register new users"""
     login = current_user.is_authenticated
     if not login:
         return abort(401)
@@ -117,10 +119,20 @@ def register():
 
 @index.route("/users", methods=["GET"])
 def users():
-    return None
+    """Renders a webpage with a list of users"""
+    login = current_user.is_authenticated
+    if not login:
+        return abort(401)
+    users = User.query.all()
+    ret = []
+    if users:
+        ret = [(user.id, user.username) for user in users]
+    return render_template('user_list.html', user_list=ret, login=login)
+
 
 @index.route("/profile", methods=["GET", "POST"])
 def profile():
+    """Renders a webpage that allows users to update their password"""
     login = current_user.is_authenticated
     if not login:
         return abort(401)

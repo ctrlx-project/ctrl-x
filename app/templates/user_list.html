@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Report
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+              <th scope="col">User ID</th>
+              <th scope="col">User name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for name in user_list%}
+                <tr>
+                    <td>
+                        {{name[0]}}
+                    </td>
+                    <td>{{name[1]}}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block imports %}
+
+{% endblock %}
