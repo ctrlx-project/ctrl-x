@@ -186,7 +186,7 @@ def list_reports():
     reports = Report.query.all()
     ret = []
     if reports:
-        ret = [(report.id, report.ip, report.time.strftime("%Y-%M-%D"), report.time.strftime("%H:%M:%S")) for report in reports]
+        ret = [(report.id, report.ip, report.time.strftime("%Y-%m-%d"), report.time.strftime("%H:%M:%S")) for report in reports]
     message = ""
     if len(ret) == 0:
         message = "You have not done any scan"
