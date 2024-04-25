@@ -1,4 +1,4 @@
-from flask import Blueprint,request,escape,jsonify
+from flask import Blueprint,request,escape,jsonify, render_template
 from models import db, Scan, Report, Setting
 from utils import success_resp, error_resp, validate_scan_job
 from scannerd import scan, test_scannerd
@@ -49,6 +49,7 @@ def _scan_():
       
 @api.route('/scan', methods=['GET'])
 def scans():
+    login = current_user.is_authenticated
     if current_user.is_authenticated or env.api_key==request.headers.get("X-api_key"):
         # if GET method, return all scans in database
         if request.method == 'GET':
@@ -58,7 +59,7 @@ def scans():
                 if result:
                     ret = [scan.info for scan in result]
                     p_list = sorted(ret, key=lambda x: x['start_time'])
-                    return jsonify(p_list)
+                    return render_template("scan.html", scan_list = p_list, login=login)
                 else:
                     return error_resp(f"Scans with ip {request_ip} not found.")
             else:

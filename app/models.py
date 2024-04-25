@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+import json
 
 db = SQLAlchemy()
 
@@ -19,6 +20,7 @@ class Scan(db.Model):
             'id':self.id,
             'ip':self.ip,
             'scan_data':self.scan_data,
+            'scan_data_str': json.dumps(self.scan_data, indent=2),
             'start_time':self.start_time,
             'end_time':self.end_time,
             'status':self.status,

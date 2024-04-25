@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Scan
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    {% for scan in scan_list%}
+    <table class="table">
+        <tbody>
+            {% for field in scan.keys() %}
+            {% if field != "scan_data" %}
+            <tr>
+                <th>
+                    {{field}}
+                </th>
+                <td>
+                    {% if field == "scan_data_str" %}
+                    <pre class="width-limit">{{scan[field]}}</pre>
+                    {% else %}
+                    {{scan[field]}}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+</div>
+{% endblock %}
