@@ -39,7 +39,7 @@ function main() {
         //console.log("hi");
         $("#ip-container").append(`<tr>`
         + `<th scope="row">${count}</th>`
-        + `<td><a href="${report_url+scan_data.id.toString()}">${scan_data.ip}</a></td>` 
+        + `<td>${scan_data.ip}</td>` 
         + `<td>${scan_data.start_time}</td>`
         + `<td>${scan_data.end_time}</td>`
         + `<td>${scan_data.status}</td>`

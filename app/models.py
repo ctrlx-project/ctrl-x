@@ -67,7 +67,7 @@ class User(UserMixin, db.Model):
     def info(self):
         return {
             'id': self.id,
-            'netid': self.username,
+            'username': self.username,
         }
 
 class Report(db.Model):

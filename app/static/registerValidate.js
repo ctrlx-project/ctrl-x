@@ -31,15 +31,18 @@ function compPassword()
     // alert("Compare");
     let password1 = document.getElementById("regPassword");
     let password2 = document.getElementById("regPassword2");
-    if (password1.value == password2.value)
+    if (password1 && password2)
     {
-        return true;
-    }
-    else
-    {
-        password2.classList.add("is-invalid");
-        password2.classList.remove("is-valid");
-        return false;
+        if (password1.value == password2.value)
+        {
+            return true;
+        }
+        else
+        {
+            password2.classList.add("is-invalid");
+            password2.classList.remove("is-valid");
+            return false;
+        }
     }
 }
 
@@ -67,8 +70,11 @@ let password = document.getElementById("regPassword");
 let password2 = document.getElementById("regPassword2");
 password.addEventListener("keyup", ()=>{
     // Update password2's pattern
-    let password2Pattern = password.value.replaceAll(/\W/g, (val)=>"\\"+val);
-    password2.setAttribute("pattern", password2Pattern);
+    if (password2)
+    {
+        let password2Pattern = password.value.replaceAll(/\W/g, (val)=>"\\"+val);
+        password2.setAttribute("pattern", password2Pattern);
+    }
     // Check if each constraint is satified and change the requirements' color
     let val = password.value;
     togglePasswordReq(document.getElementById("letter"), val.match(/[a-zA-Z]/))
