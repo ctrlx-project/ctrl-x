@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+import json
 
 db = SQLAlchemy()
 
@@ -19,6 +20,7 @@ class Scan(db.Model):
             'id':self.id,
             'ip':self.ip,
             'scan_data':self.scan_data,
+            'scan_result': json.dumps(self.scan_data, indent=2),
             'start_time':self.start_time,
             'end_time':self.end_time,
             'status':self.status,
@@ -74,9 +76,23 @@ class Report(db.Model):
     __tablename__ = 'report'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete='SET NULL', onupdate='CASCADE'))
+    scan_id = db.Column(db.Integer, db.ForeignKey(Scan.id, ondelete='SET NULL', onupdate='CASCADE'))
     ip = db.Column(db.String(16), nullable=False)
     time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     content = db.Column(db.String())
     status = db.Column(db.String(15))
     user = db.relationship('User', backref=db.backref('report', lazy=True))
+    scan = db.relationship('Scan', backref=db.backref('report', lazy=True))
+
+    @property
+    def info(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'scan_id': self.scan_id,
+            'ip': self.ip,
+            'time': self.time,
+            'content': self.content,
+            'status': self.status,
+        }
 

@@ -6,6 +6,7 @@ from utils import error_resp, success_resp
 import re
 import os
 import markdown
+import requests
 
 index = Blueprint('index', __name__, static_folder='static', template_folder='templates')
 
@@ -14,10 +15,22 @@ index = Blueprint('index', __name__, static_folder='static', template_folder='te
 def home():
     login = current_user.is_authenticated
     if request.method == 'GET':
-        return render_template('home.html', login=login)
-    # elif request.method == "POST":
-    #     ip = request.form.get('ip')
-
+        return render_template('home.html')
+    elif request.method == "POST":
+        ip = request.form.get('ip')
+        # try:
+        r = requests.post('http://127.0.0.1:5000/api/scan-new', data={'ip':ip} )
+        print(r)
+        response = r.json()
+        print(response)
+        if response['status'] == 'success':
+            return render_template('home.html', success_req = response['message'])
+        elif response['status'] == 'error':
+            print("hi")
+            return render_template('home.html', success_req = response['message'])
+        # except:
+        #     print("hi1")
+        #     return render_template('home.html', success_req="Invalid ip or request") 
 
 
 @index.route('/scans')

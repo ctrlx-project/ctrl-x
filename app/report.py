@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import time
 import requests
 import json
-from models import db, Exploit, Report, User
+from models import db, Exploit, Report, User, Scan
 from celery import shared_task
 from app import env, create_app
 from sys import stderr
@@ -203,14 +203,15 @@ def generate_report(exploitResult: dict, tokenizer:AutoTokenizer, model:AutoMode
      return "".join(report)
 
 @shared_task(ignore_result=False, name='report', autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
-def report_job(id:int, user_id:int, ip:str) -> bool:
+def report_job(exploit_id:int, user_id:int, scan_id:int) -> bool:
      # Takes a report job and save the result into the database.
      # Return boolean based on whether the job is completed.
      with app.app_context():
           user = User.query.filter_by(id=user_id).first()
-          exploit = Exploit.query.filter_by(id=id).first()
+          exploit = Exploit.query.filter_by(id=exploit_id).first()
           exploit_data = json.loads(exploit.exploit_data)
-          newReport = Report(user_id=user, ip=ip, status="running")
+          scan = Scan.query.filter_by(id=scan_id).first()
+          newReport = Report(user_id=user, ip=scan.ip, scan_id=scan, status="running")
           db.session.add(newReport)
           db.session.commit()
      try:
