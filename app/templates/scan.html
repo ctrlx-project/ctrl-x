@@ -6,6 +6,7 @@ Scan
 
 {% block body %}
 <div class="container">
+    <h2>Scan result</h2>
     {% for scan in scan_list%}
     <table class="table">
         <tbody>
@@ -16,7 +17,7 @@ Scan
                     {{field}}
                 </th>
                 <td>
-                    {% if field == "scan_data_str" %}
+                    {% if field == "scan_result" %}
                     <pre class="width-limit">{{scan[field]}}</pre>
                     {% else %}
                     {{scan[field]}}
