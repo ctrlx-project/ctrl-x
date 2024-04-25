@@ -96,7 +96,7 @@ def register():
         if not (username and password and passwordSecond):
             return render_template("register.html", registerError = "Please complete all the fields", login=login)
         if password != passwordSecond:
-            return render_template("register.html", registerError = "Passwords do not match")
+            return render_template("register.html", registerError = "Passwords do not match", login=login)
         if len(password) < 8 or not re.search("[a-zA-Z]", password) or not re.search("[0-9]", password):
             registerError = "<div class='text-start'>Password do not meet the requirements:\
             \n<ul><li>Password needs to have at least 8 characters</li>\
@@ -115,9 +115,36 @@ def register():
         db.session.commit()
         return redirect(url_for('index.home')) 
 
-@index.route("/unregister", methods=["GET", "POST"])
-def unregister():
+@index.route("/users", methods=["GET"])
+def users():
     return None
+
+@index.route("/profile", methods=["GET", "POST"])
+def profile():
+    login = current_user.is_authenticated
+    if not login:
+        return abort(401)
+    if request.method == "GET":
+        return render_template("profile.html", user=current_user.username, login=login)
+    else:
+        password = request.form.get("new_password")
+        old_password = request.form.get("old_password")
+        if not (password and old_password):
+            return render_template("profile.html", registerError = "Please complete all the fields", login=login, user=current_user.username)
+        if len(password) < 8 or not re.search("[a-zA-Z]", password) or not re.search("[0-9]", password):
+            registerError = "<div class='text-start'>Password do not meet the requirements:\
+            \n<ul><li>Password needs to have at least 8 characters</li>\
+            \n<li>Password needs to contain at least one letter</li>\
+            \n<li>Password needs to contain at least one number</li></ul></div>";
+            return render_template("profile.html", registerError = registerError, login=login, user=current_user.username)
+        if check_password_hash(current_user.password, old_password):
+            user = User.query.filter_by(username=current_user.username).first()
+            user.password = generate_password_hash(password, method='pbkdf2:sha256')
+            db.session.add(user)
+            db.session.commit()
+            return render_template("profile.html", success = True, login=login, user=current_user.username)
+        return render_template("profile.html", registerError = "Current password is incorrect", login=login, user=current_user.username)
+
 
 @index.route('/reports/<id>')
 def show_report(id):

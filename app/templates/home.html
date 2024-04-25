@@ -29,6 +29,13 @@ Home
 </div>
 <div class="card text-center" style="width: 18rem; margin-top: 10em ">
   <div class="card-body">
+    <h5 class="card-title">Reports</h5>
+    <p class="card-text" style="margin-top:2em">Here you can see reports of past scan.</p>
+    <a href="{{url_for('index.list_reports')}}" class="btn btn-primary">Go to Reports</a>
+  </div>
+</div>
+<div class="card text-center" style="width: 18rem; margin-top: 10em ">
+  <div class="card-body">
     <h5 class="card-title">Request New Job</h5>
     <p class="card-text" style="margin-top:2em">Here you can request a new job after inputting a valid ip or ip subnet</p>
     <form action="{{url_for('api._scan_')}}" method="post">
@@ -36,6 +43,16 @@ Home
       <input type="text" id="ip_block" name="ip_block">
       <input style="margin-top:1em"type="submit" value="Submit">
     </form>
+  </div>
+</div>
+<div class="card text-center" style="width: 18rem; margin-top: 10em ">
+  <div class="card-body">
+    <h5 class="card-title">Manage users</h5>
+    <p class="card-text" style="margin-top:2em">Here you can view users that have access to this portal and create new users.</p>
+    <a href="{{url_for('index.users')}}" class="btn btn-primary">Manage users</a>
+    <br>
+    <br>
+    <a href="{{url_for('index.register')}}" class="btn btn-primary">Register new users</a>
   </div>
 </div>
 {% endif %}
