@@ -28,3 +28,7 @@
     max-width: 70vw;
     overflow: scroll;
 }
+
+#scan_chart {
+    width:80%;
+}

@@ -20,7 +20,7 @@ for file in os.listdir(directory):
     data = json.load(f)
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(Scan(scan_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
+    scans.append(Scan(scan_data=data, ip=ip, start_time=datetime.now(), end_time=datetime.now(), status='complete'))
     f.close()
 
 with app.app_context():
@@ -46,7 +46,7 @@ for file in os.listdir(directory):
     filename = os.fsdecode(file)
     f = open(os.path.join(directory, filename))
     data = f.read()
-    ip = Path(os.path.join(directory, filename)).stem + '/24'
+    ip = Path(os.path.join(directory, filename)).stem
     count += 1
     match_scan = False
     with app.app_context():
@@ -78,7 +78,7 @@ for file in os.listdir(directory):
     data = json.load(f)
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(Exploit(exploit_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
+    scans.append(Exploit(exploit_data=data, ip=ip, start_time=datetime.now(), end_time=datetime.now(), status='complete'))
     f.close()
 
 with app.app_context():
@@ -99,7 +99,7 @@ for file in os.listdir(directory):
     data = json.load(f)
     ip = Path(os.path.join(directory, filename)).stem
     count += 1
-    scans.append(Parsed(parsed_data=data, ip=ip+'/24', start_time=datetime.now(), end_time=datetime.now(), status='complete'))
+    scans.append(Parsed(parsed_data=data, ip=ip, start_time=datetime.now(), end_time=datetime.now(), status='complete'))
     f.close()
 
 with app.app_context():
