@@ -31,7 +31,7 @@ Home
   <div class="card-body">
     <h5 class="card-title">Request New Job</h5>
     <p class="card-text" style="margin-top:2em">Here you can request a new job after inputting a valid ip or ip subnet</p>
-    <form action="{{url_for('api._scan_')}}" method="post">
+    <form action="{{url_for('index.home')}}" method="post">
       <label for="ip_block">IP:</label><br>
       <input type="text" id="ip_block" name="ip_block">
       <input style="margin-top:1em"type="submit" value="Submit">
@@ -39,4 +39,13 @@ Home
   </div>
 </div>
 {% endif %}
+<div class="grid" style=" --bs-rows:4 --bs-columns: 2; --bs-gap: 5rem;">
+  <div class="grid" style="row-gap: 0;">
+    <div class="g-col-6">.g-col-6</div>
+    <div class="g-col-6">.g-col-6</div>
+  
+    <div class="g-col-6">.g-col-6</div>
+    <div class="g-col-6">.g-col-6</div>
+  </div>
+</div>
 {% endblock %}

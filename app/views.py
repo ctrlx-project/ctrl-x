@@ -6,6 +6,7 @@ from utils import error_resp, success_resp
 import re
 import os
 import markdown
+import requests
 
 index = Blueprint('index', __name__, static_folder='static', template_folder='templates')
 
@@ -14,8 +15,10 @@ index = Blueprint('index', __name__, static_folder='static', template_folder='te
 def home():
     if request.method == 'GET':
         return render_template('home.html')
-    # elif request.method == "POST":
-    #     ip = request.form.get('ip')
+    elif request.method == "POST":
+        ip = request.form.get('ip')
+        r = requests.post('')
+        return render_template('home.html', success_req = success_req)
 
 
 

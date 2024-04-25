@@ -3,11 +3,11 @@ window.addEventListener("load", main);
 
 function main() {
 
-    const testurl= 'http://127.0.0.1:5000/api/scan?ip=10.1.0.1%2F24';
+    const testurl= '/api/scan?ip=10.1.0.1%2F24';
 
-    const apiurl = 'http://127.0.0.1:5000/api/scan';
+    const apiurl = '/api/scan';
 
-    const report_url = 'http://127.0.0.1:5000/reports/';
+    const report_url = '/reports/';
     
     // test api call
     // $.ajax({

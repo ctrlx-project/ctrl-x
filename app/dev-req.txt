@@ -12,3 +12,4 @@ celery
 flask_login
 werkzeug
 markdown
+requests
