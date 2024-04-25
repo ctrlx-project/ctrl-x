@@ -8,6 +8,19 @@ CTRL-X
 <script type="text/javascript" src="{{ url_for('static', filename='app.js') }}"></script>
 {% endblock %}
 {% block body %}
-<section id="ip-container">
-</section>
+    <div class="container w-75">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">IP</th>
+                    <th scope="col">Start Time</th>
+                    <th scope="col">End Time</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody id="ip-container">
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

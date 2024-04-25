@@ -10,13 +10,21 @@ import markdown
 index = Blueprint('index', __name__, static_folder='static', template_folder='templates')
 
 
-@index.route('/')
+@index.route('/', methods=['GET','POST'])
 def home():
-    return render_template('index.html')
+    if request.method == 'GET':
+        return render_template('home.html')
+    # elif request.method == "POST":
+    #     ip = request.form.get('ip')
+
+
 
 @index.route('/scans')
 def show_scans():
-    return render_template('general_scans.html')
+    if current_user.is_authenticated:
+        return render_template('general_scans.html')
+    else:
+        return error_resp('Must be logged in to see scans')
 
 @index.route('/login')
 def login():

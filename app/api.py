@@ -4,6 +4,7 @@ from utils import success_resp, error_resp, validate_scan_job
 from scannerd import scan, test_scannerd
 from celery.result import AsyncResult
 from time import sleep
+from flask_login import current_user
 
 api = Blueprint('api', __name__, static_folder='static', template_folder='templates')
 
@@ -30,34 +31,41 @@ def test_mq():
 
 @api.route('/scan-new', methods=['POST'])
 def _scan_():
-    # Dispatch scan using block/FQDN. This passes the job to scannerd
-    ip_block = request.form.get('ip_block')
-    if not ip_block:
-        return error_resp('IP/IP block/FQDN is required')
-    if ip_block := validate_scan_job(ip_block):
-        scan.delay(ip_block=ip_block)
-        return success_resp('Scan job dispatched')
+    if current_user.is_authenticated:
+        # Dispatch scan using block/FQDN. This passes the job to scannerd
+        ip_block = request.form.get('ip_block')
+        if not ip_block:
+            return error_resp('IP/IP block/FQDN is required')
+        if ip_block := validate_scan_job(ip_block):
+            scan.delay(ip_block=ip_block)
+            return success_resp('Scan job dispatched')
+        else:
+            return error_resp('Invalid IP/FQDN')
     else:
-        return error_resp('Invalid IP/FQDN')
+        return error_resp('Must be logged in to request a new scan.')
 
       
-@api.route('/scan', methods=['GET','POST'])
+@api.route('/scan', methods=['GET'])
 def scans():
-    # if GET method, return all scans in database
-    if request.method == 'GET':
-        if ip:=request.args.get('ip'):
-            request_ip = str(escape(ip))
-            result = Scan.query.filter(Scan.ip==request_ip)
-            if result:
-                ret = [scan.info for scan in result]
-                return jsonify(ret)
+    if current_user.is_authenticated:
+        # if GET method, return all scans in database
+        if request.method == 'GET':
+            if ip:=request.args.get('ip'):
+                request_ip = str(escape(ip))
+                result = Scan.query.filter(Scan.ip==request_ip)
+                if result:
+                    ret = [scan.info for scan in result]
+                    p_list = sorted(ret, key=lambda x: x['start_time'])
+                    return jsonify(p_list)
+                else:
+                    return error_resp(f"Scans with ip {request_ip} not found.")
             else:
-                return error_resp(f"Scans with ip {request_ip} not found.")
-        else:
-            result = Scan.query.all()
-            if result:
-                ret = [scan.info for scan in result]
-                return jsonify(ret)
-            else:
-                return error_resp("No scans yet!")
-    # if POST method, return scans with matching IP's
+                result = Scan.query.all()
+                if result:
+                    ret = [scan.info for scan in result]
+                    p_list = sorted(ret, key=lambda x: x['start_time'])
+                    return jsonify(p_list)
+                else:
+                    return error_resp("No scans yet!")
+    else:
+        return error_resp('Must be authenticated to see scans')
