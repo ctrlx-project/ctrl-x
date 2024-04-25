@@ -67,7 +67,7 @@ class User(UserMixin, db.Model):
     def info(self):
         return {
             'id': self.id,
-            'netid': self.username,
+            'username': self.username,
         }
 
 class Report(db.Model):
@@ -79,4 +79,15 @@ class Report(db.Model):
     content = db.Column(db.String())
     status = db.Column(db.String(15))
     user = db.relationship('User', backref=db.backref('report', lazy=True))
+
+    @property
+    def info(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'ip': self.ip,
+            'time': self.time,
+            'content': self.content,
+            'status': self.status,
+        }
 

@@ -23,6 +23,7 @@ class Env:
     result_backend: str = environ.get("POSTGRES_URL", default="db+postgresql://admin:admin@localhost:5432/ctrl-x")
     secret_key:str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
     ml_access_token:str = environ.get("ML_ACCESS_TOKEN", default="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")
+    api_key:str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
 
     app = None
 

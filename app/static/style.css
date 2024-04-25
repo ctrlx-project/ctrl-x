@@ -1,0 +1,25 @@
+.homepage-card {
+    width: 18rem; 
+    margin-top: 2em;
+    margin-left: 2em;
+    margin-right: 2em;
+    margin-bottom: 2em;
+}
+
+.steps{
+    margin-left:12em;
+    margin-top:6em;
+}
+
+.instruct{
+    margin-right: 12em;
+    margin-top:6em;
+}
+
+.card-text {
+    margin-top:2em;
+}
+
+.small-mt {
+    margin-top:1em;
+}

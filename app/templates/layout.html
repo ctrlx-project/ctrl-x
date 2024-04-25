@@ -12,6 +12,9 @@
         rel="stylesheet" 
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
         crossorigin="anonymous">
+    <link href="{{ url_for('static', filename='style.css') }}" 
+    rel="stylesheet" 
+    >
 
     {% block imports %}
     {% endblock %}
@@ -29,6 +32,9 @@
                 <a class="nav-link active" aria-current="page" href="{{url_for('index.home')}}">Home</a>
               </li>
               {% if current_user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('index.profile')}}">Profile</a>
+              </li>    
               <li class="nav-item">
                 <a class="nav-link" href="{{url_for('index.logout')}}">Logout</a>
               </li>
@@ -49,7 +55,7 @@
       {% block header %}{% endblock %}
     </h1>
   </div>
-  <div class="d-flex flex-direction:column justify-content-evenly">
+  <div class="d-flex flex-column justify-content-evenly">
     {% block body %}{% endblock %}
   </div>
 

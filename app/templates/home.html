@@ -5,6 +5,8 @@ Home
 {% endblock %}
 
 {% block imports %}
+<script src="../static/form.js"></script>
+<script src="/static/settings.js"></script>
 {% endblock %}
 
 {% block header %}
@@ -19,33 +21,122 @@ Home
 <!-- <a href="{{url_for('index.show_scans')}}" >
     <button>Request Data</button>
 </a> -->
+<div class="container">
+  <hr class="hr-blurry" />
+</div>
+<div class="container text-center">
+  <h3>We're so glad you're here to help us in our mission to help make cybersecurity more accessible to everyone!</h3>
+</div>
+<div class="container">
+  <hr class="hr-blurry" />
+</div>
 {% if current_user.is_authenticated %}
-<div class="card text-center" style="width: 18rem; margin-top: 10em ">
-  <div class="card-body">
-    <h5 class="card-title">Scans</h5>
-    <p class="card-text" style="margin-top:2em">Here you can see historic and current scan jobs requested.</p>
-    <a href="{{url_for('index.show_scans')}}" class="btn btn-primary">Go to Data</a>
+
+<div class="d-flex flex-row justify-content-center">
+  <div class="d-flex flex-row w-25 steps justify-content-end">
+    <h3>Step 1</h3>
+  </div>
+  <div class="card text-center homepage-card">
+    <div class="card-body">
+      <h5 class="card-title">Request New Job</h5>
+      <p class="card-text">Here you can request a new job after inputting a valid ip or ip subnet</p>
+      <form id="ip-form">
+        <label for="ip_block">IP:</label><br>
+        <input type="text" id="ip_block" name="ip_block">
+        <input class="small-mt" type="submit" value="Submit">
+        <p class="card-text" id="response" name="response"></p>
+      </form>
+    </div>
+  </div>
+  <div class="d-flex flex-row w-25 instruct justify-content-start">
+    <h3>Request a new job</h3>
   </div>
 </div>
-<div class="card text-center" style="width: 18rem; margin-top: 10em ">
-  <div class="card-body">
-    <h5 class="card-title">Request New Job</h5>
-    <p class="card-text" style="margin-top:2em">Here you can request a new job after inputting a valid ip or ip subnet</p>
-    <form action="{{url_for('index.home')}}" method="post">
-      <label for="ip_block">IP:</label><br>
-      <input type="text" id="ip_block" name="ip_block">
-      <input style="margin-top:1em"type="submit" value="Submit">
-    </form>
+<div class="d-flex flex-row justify-content-center">
+  <div class="d-flex flex-row w-25 steps justify-content-end">
+    <h3>Step 2</h3>
+  </div>
+  <div class="d-flex justify-content-center">
+    <div class="card text-center homepage-card" >
+      <div class="card-body">
+        <h5 class="card-title">Scans</h5>
+        <p class="card-text">Here you can see historic and current scan jobs requested.</p>
+        <a href="{{url_for('index.show_scans')}}" class="btn btn-primary">Go to Data</a>
+      </div>
+    </div>
+    <div class="card text-center homepage-card">
+      <div class="card-body">
+        <h5 class="card-title">Reports</h5>
+        <p class="card-text">Here you can see reports of past scans.</p>
+        <a href="{{url_for('index.list_reports')}}" class="btn btn-primary">Go to Reports</a>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex flex-row w-25 instruct justify-content-start">
+    <h3>View Scans and Reports</h3>
+  </div>
+</div>
+<div class="container" style="margin-top:2em">
+  <hr class="hr-blurry" />
+</div>
+<div class="d-flex justify-content-center">
+  <div class="card text-center homepage-card">
+    <div class="card-body">
+      <h5 class="card-title">Request New Job</h5>
+      <p class="card-text">Here you can request a new job after inputting a valid ip or ip subnet</p>
+      <form id="ip-form">
+        <label for="ip_block">IP:</label><br>
+        <input type="text" id="ip_block" name="ip_block">
+        <input class="small-mt" type="submit" value="Submit">
+        <p class="card-text" id="response" name="response"></p>
+      </form>
+    </div>
+  </div>
+  <div class="card text-center homepage-card">
+    <div class="card-body">
+      <h5 class="card-title">Manage users</h5>
+      <p class="card-text">Here you can view users that have access to this portal and create new users.</p>
+      <a href="{{url_for('index.users')}}" class="btn btn-primary">View other users</a>
+      <br>
+      <br>
+      <a href="{{url_for('index.register')}}" class="btn btn-primary">Register new users</a>
+    </div>
+  </div>
+</div>
+<div class="">
+  <div class="d-flex justify-content-center">
+    <div class="card text-center homepage-card" >
+      <div class="card-body">
+        <h5 class="card-title">Scans</h5>
+        <p class="card-text">Here you can see historic and current scan jobs requested.</p>
+        <a href="{{url_for('index.show_scans')}}" class="btn btn-primary">Go to Data</a>
+      </div>
+    </div>
+    <div class="card text-center homepage-card">
+      <div class="card-body">
+        <h5 class="card-title">Reports</h5>
+        <p class="card-text">Here you can see reports of past scans.</p>
+        <a href="{{url_for('index.list_reports')}}" class="btn btn-primary">Go to Reports</a>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="card text-center homepage-card">
+      <div class="card-body">
+        <h5 class="card-title">Settings</h5>
+        <p class="card-text">Here you can write a custom nmap scan to run</p>
+        <form id="command-form">
+          <label for="command">New Command:</label><br>
+          <input type="text" id="command" name="command">
+          <label for="command">New DNS:</label><br>
+          <input type="text" id="dns" name="dns">
+          <input class="small-mt" type="submit" value="Submit">
+          <p class="card-text" id="response_settings" name="response_settings"></p>
+        </form>
+        <button id="def" name="default" type="button" class="btn btn-primary">Default</button>
+      </div>
+    </div>
   </div>
 </div>
 {% endif %}
-<div class="grid" style=" --bs-rows:4 --bs-columns: 2; --bs-gap: 5rem;">
-  <div class="grid" style="row-gap: 0;">
-    <div class="g-col-6">.g-col-6</div>
-    <div class="g-col-6">.g-col-6</div>
-  
-    <div class="g-col-6">.g-col-6</div>
-    <div class="g-col-6">.g-col-6</div>
-  </div>
-</div>
 {% endblock %}
