@@ -20,21 +20,21 @@ Home
     <button>Request Data</button>
 </a> -->
 {% if current_user.is_authenticated %}
-<div class="card text-center" style="width: 18rem; margin-top: 10em ">
+<div class="card text-center" style="width: 18rem; margin-top: 2em ">
   <div class="card-body">
     <h5 class="card-title">Scans</h5>
     <p class="card-text" style="margin-top:2em">Here you can see historic and current scan jobs requested.</p>
     <a href="{{url_for('index.show_scans')}}" class="btn btn-primary">Go to Data</a>
   </div>
 </div>
-<div class="card text-center" style="width: 18rem; margin-top: 10em ">
+<div class="card text-center" style="width: 18rem; margin-top: 2em ">
   <div class="card-body">
     <h5 class="card-title">Reports</h5>
     <p class="card-text" style="margin-top:2em">Here you can see reports of past scan.</p>
     <a href="{{url_for('index.list_reports')}}" class="btn btn-primary">Go to Reports</a>
   </div>
 </div>
-<div class="card text-center" style="width: 18rem; margin-top: 10em ">
+<div class="card text-center" style="width: 18rem; margin-top: 2em ">
   <div class="card-body">
     <h5 class="card-title">Request New Job</h5>
     <p class="card-text" style="margin-top:2em">Here you can request a new job after inputting a valid ip or ip subnet</p>
@@ -45,7 +45,7 @@ Home
     </form>
   </div>
 </div>
-<div class="card text-center" style="width: 18rem; margin-top: 10em ">
+<div class="card text-center" style="width: 18rem; margin-top: 2em ">
   <div class="card-body">
     <h5 class="card-title">Manage users</h5>
     <p class="card-text" style="margin-top:2em">Here you can view users that have access to this portal and create new users.</p>
