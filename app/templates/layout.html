@@ -30,14 +30,20 @@
               </li>
               {% if current_user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link" href="{{url_for('index.logout')}}">Logout</a>
+                <a class="nav-link" href="{{url_for('index.list_reports')}}">Reports</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{{url_for('index.register')}}">Register</a>
+                <a class="nav-link" href="{{url_for('index.register')}}">Add User</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('index.unregister')}}">Remove User</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">Profile</a>
               </li>    
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('index.logout')}}">Logout</a>
+              </li>
               {% else %}
               <li class="nav-item">
                 <a class="nav-link" href="{{url_for('index.login')}}">Login</a>

@@ -79,9 +79,6 @@ def auth():
 
 @index.route('/logout')
 def logout():
-    login = current_user.is_authenticated
-    if not login:
-        return abort(404)
     logout_user()
     return redirect(url_for('index.home'))
 
@@ -89,7 +86,7 @@ def logout():
 def register():
     login = current_user.is_authenticated
     if not login:
-        return abort(404)
+        return abort(401)
     if request.method == "GET":
         return render_template("register.html", login=login)
     elif request.method == "POST":
@@ -118,6 +115,10 @@ def register():
         db.session.commit()
         return redirect(url_for('index.home')) 
 
+@index.route("/unregister", methods=["GET", "POST"])
+def unregister():
+    return None
+
 @index.route('/reports/<id>')
 def show_report(id):
     """
@@ -127,7 +128,7 @@ def show_report(id):
     """
     login = current_user.is_authenticated
     if not login:
-        return abort(404)
+        return abort(401)
     report = Report.query.filter_by(id=id).first()
     if not report:
         return abort(404)
@@ -142,7 +143,7 @@ def list_reports():
     """Renders a webpage with a list of reports"""
     login = current_user.is_authenticated
     if not login:
-        return abort(404)
+        return abort(401)
     reports = Report.query.all()
     ret = []
     if reports:
