@@ -52,11 +52,11 @@ for file in os.listdir(directory):
     with app.app_context():
         scan = Scan.query.filter_by(ip=ip).first()
         if scan:
-            reports.append(Report(content=data, ip=ip, time=datetime.now(), user=user1, scan=scan))
+            reports.append(Report(content=data, ip=ip, time=datetime.now(), scan=scan))
             match_scan = True
             print(f"Report for {ip} has a matching scan")
     if not match_scan:
-        reports.append(Report(content=data, ip=ip, time=datetime.now(), user=user1))
+        reports.append(Report(content=data, ip=ip, time=datetime.now()))
     f.close()
 
 with app.app_context():
