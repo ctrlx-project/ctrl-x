@@ -29,6 +29,6 @@
     overflow: scroll;
 }
 
-#scan_chart {
-    width:80%;
+.chart {
+    width:40vw;
 }

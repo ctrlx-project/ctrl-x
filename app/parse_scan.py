@@ -113,7 +113,7 @@ def parse_from_json(file):
     dictionary = load_json(file)
     return parse_scan(dictionary)
 
-@shared_task(ignore_result=True, name='parse_scan', autoretry_for=(Exception,), retry_backoff=True,
+@shared_task(ignore_result=False, name='parse_scan', autoretry_for=(Exception,), retry_backoff=True,
              retry_jitter=True, retry_kwargs={'max_retries': 3})
 def parse_scan_job(scan_id: str):
     if scan_id:
@@ -137,6 +137,7 @@ def parse_scan_job(scan_id: str):
         parsed_scan.end_time = datetime.now()
         db.session.add(parsed_scan)
         db.session.commit()
+        return parse_scan.id, scan_id
 
 def main():
     result = parse_from_json(argv[1])

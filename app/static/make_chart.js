@@ -48,7 +48,64 @@ function makeChart(scan_list)
             labels: {
                 fontColor: "rgba(255,255,255,1.0)"
             }
+        },
+        title: {
+            display: true,
+            text: "Status of scans",
+            fontColor: "rgba(255,255,255,1.0)"
         }
       }
     });
+    let ip = new Set()
+    let ip_count = 0
+    for (let i = 0; i < scan_list.length; i++)
+    {
+        if (!ip.has(scan_list[i].ip))
+        {
+            ip.add(scan_list[i].ip)
+            ip_count += 1
+        }
+    }
+    new Chart("ip_chart", {
+        type: "bar",
+        data: {
+        labels: ["Number of IP scanned"],
+          datasets: [{
+            label: "Number of IP scanned",
+            data: [ip_count],
+            backgroundColor: ["rgba(34,112,57,1.0)"],
+            barThickness: 50
+          }]
+
+        },
+        options: {
+            legend: {
+                labels: {
+                    fontColor: "rgba(255,255,255,1.0)"
+                }
+            },
+            title: {
+                display: true,
+                text: "Number of IP scanned",
+                fontColor: "rgba(255,255,255,1.0)"
+            },
+            scales: {
+                xAxes: [
+                    {
+                        display: false
+                }
+                ],
+                yAxes: [
+                    {
+                        gridLines: {
+                            color: "rgba(255,255,255,1.0)",
+                        },
+                        ticks: {
+                            fontColor: "rgba(255,255,255,1.0)"
+                        }
+                }
+                ]
+            }
+        }
+      });
   }
