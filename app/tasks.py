@@ -1,5 +1,5 @@
-from app import env, create_app
-from utils import resolve_ip_block
+from app import create_app
+from utils import resolve_ip_block, success_resp
 from celery import shared_task, chain
 
 from scanner import test_scanner, scanner
@@ -10,9 +10,9 @@ try:
     from report import report
 except Exception:
     skip_report = True
-    print("######################################################")
+    print("#########################################################")
     print("### LLM requirements not met. Skipping report generation.")
-    print("######################################################")
+    print("#########################################################")
 
 app = create_app()
 celery_app = app.extensions["celery"]
@@ -75,11 +75,7 @@ def dispatch_scan(ip_block: str):
     """
 
     ip_list = resolve_ip_block(ip_block)
-    print(ip_list)
     for ip in ip_list:
         chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
 
-    return {
-        'status': 'success',
-        'message': f'{len(ip_list)} scan job(s) dispatched.'
-    }
+    return success_resp(f'{len(ip_list)} scan job(s) dispatched.')
