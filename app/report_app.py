@@ -18,6 +18,8 @@ access_token = environ.get("ml_access_token")
 if access_token is None:
     access_token = "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"
 server = environ.get("server")
+if server is None:
+    server = "http://127.0.0.1:5000/"
 environ["LOCKED"] = "False"
 try:
    mp.set_start_method('spawn', force=True)
@@ -45,12 +47,13 @@ def return_report(report_id:int, exploit_data:dict)->None:
     while (environ.get("LOCKED") == "True"):
         sleep(3)
     environ["LOCKED"] = "True"
-    print(report_id)
-    print(exploit_data)
-    result = generate_report(exploit_data, tokenizer, model)
-    requests.post(server, data={"report_id":report_id, "report":result})
-    print("completed")
-    environ["LOCKED"] = "False"
+    try:
+        result = generate_report(exploit_data, tokenizer, model)
+        requests.post(server, data={"report_id":report_id, "report":result})
+    except:
+        requests.post(server, data={"report_id":report_id, "status":failed})
+    finally:
+        environ["LOCKED"] = "False"
 
 
 

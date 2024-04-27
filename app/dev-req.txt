@@ -13,3 +13,4 @@ flask_login
 werkzeug
 markdown
 requests
+python-dotenv
