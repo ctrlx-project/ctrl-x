@@ -1,16 +1,11 @@
-from celery import shared_task
-
 from sys import argv
-
 from utils import load_json
-
 from models import db, Parsed, Scan
-
 from datetime import datetime
-
 import json
 
-def get_cve(string:str)->list:
+
+def get_cve(string: str) -> list:
     """Parses a given string and returns a list of all CVEs included on it.
 
     Args:
@@ -35,8 +30,8 @@ def get_cve(string:str)->list:
     return result
 
 
-def parse_scan(scan_result:dict)->dict:
-    """ Parse a single scan dictionary and extract useful informations.
+def parse_scan_result_(scan_result: dict) -> dict:
+    """ Parse a single scan dictionary and extract useful information.
     The return result should be a dictionary contain the state of the host, 
     transport layer protocols that find open ports, 
     information regarding open ports, and vulnerability 
@@ -64,15 +59,15 @@ def parse_scan(scan_result:dict)->dict:
     scan = scan_result.get("scan")
     if scan is None:
         return {}
-    if (len(scan.keys()) < 1):
+    if len(scan.keys()) < 1:
         return {}
     for network in scan.keys():
         network_result = scan.get(network)
-        state = network_result.get("status",{}).get("state")
+        state = network_result.get("status", {}).get("state")
         if state is None:
             return {}
         result[network] = {"state": state}
-        if (state != "up"):
+        if state != "up":
             return {}
         fields = ["tcp", "udp"]
         network_keys = network_result.keys()
@@ -95,8 +90,8 @@ def parse_scan(scan_result:dict)->dict:
                         if product:
                             service = f'{product} {version}'.strip()
                             result[network]["ports"][port]["service"] = service
-                        vulner = port_result.get("script",{}).get("vulners")
-                        if vulner and isinstance(vulner,str):
+                        vulner = port_result.get("script", {}).get("vulners")
+                        if vulner and isinstance(vulner, str):
                             result[network]["ports"][port]["vulner"] = get_cve(vulner)
     return result
 
@@ -111,37 +106,43 @@ def parse_from_json(file):
         (dict): Parsed scan with useful information for metasploits.
     """
     dictionary = load_json(file)
-    return parse_scan(dictionary)
+    return parse_scan_result_(dictionary)
 
-@shared_task(ignore_result=False, name='parse_scan', autoretry_for=(Exception,), retry_backoff=True,
-             retry_jitter=True, retry_kwargs={'max_retries': 3})
-def parse_scan_job(scan_id: str):
+
+def parse_scan(scan_id: str):
+    """ 
+    Parse a single scan job and extract useful information
+    Args:
+        scan_id: The id of the scan job to be parsed
+    Returns:
+        Parsed scan id, scan id
+    """
     if scan_id:
         # Gets the Scan from the database
-        saved_scan = Scan.filter_by(id=scan_id).first()
+        saved_scan = Scan.query.filter_by(id=scan_id).first()
 
         # Creates the Parsed object in the database
-        loaded_scan = json.loads(saved_scan.scan_data)
+        loaded_scan = saved_scan.scan_data
         ip = next(iter(loaded_scan["scan"]))
-        start_time = datetime.now()
-        parsed_scan = Parsed(ip=ip, start_time=start_time, status='running')
+
+        parsed_scan = Parsed(ip=ip)
         db.session.add(parsed_scan)
         db.session.commit()
-
-        # Runs parser
-        parsing_result = parse_scan(loaded_scan)
 
         # Updates the Parsed object in the database
-        parsed_scan.parsed_data = parsing_result
-        parsed_scan.status = 'complete'
-        parsed_scan.end_time = datetime.now()
+        parsed_scan.parsed_data = parse_scan_result_(loaded_scan)
         db.session.add(parsed_scan)
         db.session.commit()
-        return parse_scan.id, scan_id
+
+        return parsed_scan.id, scan_id
+
+    return None, None
+
 
 def main():
     result = parse_from_json(argv[1])
     print(result)
+
 
 if __name__ == "__main__":
     if len(argv) < 2:

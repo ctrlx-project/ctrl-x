@@ -28,7 +28,7 @@ def test_get_cve():
 
 def test_parse_scan():
     """Tests parse_scan function."""
-    result = parse_scan.parse_scan(SCAN)
+    result = parse_scan.parse_scan_result_(SCAN)
     assert PARSED_SCAN == result
 
 def test_parse_from_json():

@@ -12,5 +12,6 @@ celery
 flask_login
 werkzeug
 markdown
-requests
 python-dotenv
+pymetasploit3
+requests
