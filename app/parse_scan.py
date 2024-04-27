@@ -119,7 +119,7 @@ def parse_scan(scan_id: str):
     """
     if scan_id:
         # Gets the Scan from the database
-        saved_scan = Scan.filter_by(id=scan_id).first()
+        saved_scan = Scan.query.filter_by(id=scan_id).first()
 
         # Creates the Parsed object in the database
         loaded_scan = json.loads(saved_scan.scan_data)
