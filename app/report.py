@@ -14,10 +14,6 @@ app = create_app()
 celery_app = app.extensions["celery"]
 celery_app.set_default()
 
-pretrained = "google/gemma-2b-it"
-tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
-model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
-
 
 def load_json(filepath:str)->dict:
     # Load JSON file into a dictionary
@@ -214,6 +210,9 @@ def report_job(exploit_id:int, scan_id:int) -> bool:
           db.session.add(newReport)
           db.session.commit()
      try:
+          pretrained = "google/gemma-2b-it"
+          tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
+          model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
           report = generate_report(exploit_data, tokenizer, model)
           with app.app_context():
                newReport.status = "complete"
@@ -232,9 +231,9 @@ def report_job(exploit_id:int, scan_id:int) -> bool:
 
 def main():
      exploit = load_json("./seed/exploit/metasploitable.json")
-     # pretrained = "google/gemma-2b-it"
-     # tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
-     # model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
+     pretrained = "google/gemma-2b-it"
+     tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
+     model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
      result = generate_report(exploit, tokenizer, model)
      outputFile = open("mlOutput.md", "w")
      outputFile.write(result)
