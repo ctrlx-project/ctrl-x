@@ -13,7 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 api_key = environ.get("api_key")
 if api_key is None:
-    api_key = "test"
+    api_key = "dingdongbingbongbangdangpfchans"
 access_token = environ.get("ml_access_token")
 if access_token is None:
     access_token = "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"
