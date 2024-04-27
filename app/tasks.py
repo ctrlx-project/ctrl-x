@@ -11,7 +11,7 @@ try:
 except Exception:
     skip_report = True
     print("######################################################")
-    print("### LLM modules not found. Skipping report generation.")
+    print("### LLM requirements not met. Skipping report generation.")
     print("######################################################")
 
 app = create_app()
@@ -59,6 +59,8 @@ def report_job(argv):
     Generate a report using the parsed scan data
     Returns: Bool
     """
+    if skip_report:
+        return False
     exploit_id, scan_id = argv
     return report(exploit_id, scan_id)
 
@@ -75,13 +77,9 @@ def dispatch_scan(ip_block: str):
     ip_list = resolve_ip_block(ip_block)
     print(ip_list)
     for ip in ip_list:
-        if skip_report:
-            chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s()).delay()
-        else:
-            print("Skipping report generation")
-            chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
+        chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
 
     return {
         'status': 'success',
-        'message': f'{len(ip_list)} scan jobs dispatched.'
+        'message': f'{len(ip_list)} scan job(s) dispatched.'
     }
