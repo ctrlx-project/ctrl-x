@@ -36,7 +36,7 @@ app:
 	./venv/bin/python3 main.py
 
 .PHONY: tasks
-scannerd:
+tasks:
 	@echo "### Starting scannerd"
 	sudo -E ./venv/bin/python3 -m celery -A tasks.celery_app worker --loglevel INFO
 

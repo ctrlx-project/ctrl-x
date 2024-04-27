@@ -30,6 +30,7 @@ def scan_job(ip: str):
     Scans a single IP address
     Returns: scan_id
     """
+    print("scanner")
     return scanner(ip)
 
 
@@ -72,6 +73,7 @@ def dispatch_scan(ip_block: str):
     """
 
     ip_list = resolve_ip_block(ip_block)
+    print(ip_list)
     for ip in ip_list:
         if skip_report:
             chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s()).delay()
