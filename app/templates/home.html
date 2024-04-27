@@ -5,8 +5,12 @@ Home
 {% endblock %}
 
 {% block imports %}
-<script src="../static/form.js"></script>
-<script src="/static/settings.js"></script>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+</script>
+<script src="{{url_for('static', filename='form.js')}}"></script>
+<script src="{{url_for('static', filename='settings.js')}}"></script>
+<script src="{{url_for('static', filename='make_chart.js')}}"></script>
 {% endblock %}
 
 {% block header %}
@@ -42,8 +46,8 @@ Home
       <p class="card-text">Here you can request a new job after inputting a valid ip or ip subnet</p>
       <form id="ip-form">
         <label for="ip_block">IP:</label><br>
-        <input type="text" id="ip_block" name="ip_block">
-        <input class="small-mt" type="submit" value="Submit">
+        <input type="text" class="form-control" id="ip_block" name="ip_block">
+        <input class="small-mt btn btn-primary" type="submit" value="Submit" onclick="location.reload();">
         <p class="card-text" id="response" name="response"></p>
       </form>
     </div>
@@ -95,15 +99,24 @@ Home
       <h5 class="card-title">Settings</h5>
       <p class="card-text">Here you can write a custom nmap scan to run</p>
       <form id="command-form">
-        <label for="command">New Command:</label><br>
-        <input type="text" id="command" name="command">
-        <label for="command">New DNS:</label><br>
-        <input type="text" id="dns" name="dns">
-        <input class="small-mt" type="submit" value="Submit">
+        <label for="command">New Nmap Args:</label><br>
+        <input type="text" class="form-control" id="command" name="command">
+        <label for="command" style="margin-top:10%">DNS:</label><br>
+        <input type="text" class="form-control" id="dns" name="dns">
+        <input class="small-mt btn btn-primary" type="submit" value="Submit">
         <p class="card-text" id="response_settings" name="response_settings"></p>
       </form>
       <button id="def" name="default" type="button" class="btn btn-primary">Default</button>
     </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-1"></div>
+  <div class="col-5 chart">
+    <canvas id="scan_chart"></canvas>
+  </div>
+  <div class="col-5 chart">
+    <canvas id="ip_chart"></canvas>
   </div>
 </div>
 {% endif %}

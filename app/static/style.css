@@ -28,3 +28,7 @@
     max-width: 70vw;
     overflow: scroll;
 }
+
+.chart {
+    width:40vw;
+}
