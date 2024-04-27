@@ -17,14 +17,15 @@ class Scan(db.Model):
     @property
     def info(self):
         return {
-            'id':self.id,
-            'ip':self.ip,
-            'scan_data':self.scan_data,
+            'id': self.id,
+            'ip': self.ip,
+            'scan_data': self.scan_data,
             'scan_result': json.dumps(self.scan_data, indent=2),
-            'start_time':self.start_time,
-            'end_time':self.end_time,
-            'status':self.status,
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'status': self.status,
         }
+
 
 class Exploit(db.Model):
     __tablename__ = 'exploits'
@@ -40,10 +41,8 @@ class Parsed(db.Model):
     __tablename__ = 'parsed'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(16), nullable=False)
-    parsed_data = db.Column(db.JSON, nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
-    end_time = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.String(15))
+    parsed_data = db.Column(db.JSON)
+
 
 class Setting(db.Model):
     __tablename__ = 'settings'
@@ -72,6 +71,7 @@ class User(UserMixin, db.Model):
             'username': self.username,
         }
 
+
 class Report(db.Model):
     __tablename__ = 'report'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -92,4 +92,3 @@ class Report(db.Model):
             'content': self.content,
             'status': self.status,
         }
-

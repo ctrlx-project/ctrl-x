@@ -122,17 +122,15 @@ def parse_scan(scan_id: str):
         saved_scan = Scan.query.filter_by(id=scan_id).first()
 
         # Creates the Parsed object in the database
-        loaded_scan = json.loads(saved_scan.scan_data)
+        loaded_scan = saved_scan.scan_data
         ip = next(iter(loaded_scan["scan"]))
 
-        parsed_scan = Parsed(ip=ip, start_time=datetime.now(), status='running')
+        parsed_scan = Parsed(ip=ip)
         db.session.add(parsed_scan)
         db.session.commit()
 
         # Updates the Parsed object in the database
         parsed_scan.parsed_data = parse_scan_result_(loaded_scan)
-        parsed_scan.status = 'complete'
-        parsed_scan.end_time = datetime.now()
         db.session.add(parsed_scan)
         db.session.commit()
 
