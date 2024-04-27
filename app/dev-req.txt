@@ -12,4 +12,5 @@ celery
 flask_login
 werkzeug
 markdown
+pymetasploit3
 requests
