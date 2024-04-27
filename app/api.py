@@ -141,3 +141,20 @@ def settings():
             #         return error_resp('Could not find settings, contact administrator.')
     else:
         return error_resp('Must be logged in to request a new scan.')
+
+
+@api.route('/store_report', methods=['POST'])
+def store_report():
+    if env.api_key != request.headers.get("X-api_key"):
+        return error_resp('Not open to public')
+    report_id = request.form.get("report_id")
+    if not report_id:
+        return error_resp('Missing report id')
+    report_status = request.form.get("status")
+    if not report_status:
+        return error_resp('Missing report status')
+    report = Report.query.filter_by(id=report_id).first()
+    if report_status == "failed":
+        report.status = "failed"
+        db.session.add("report")
+        db.session.commit()

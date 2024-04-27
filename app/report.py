@@ -170,7 +170,7 @@ Generated text starts here:
 
 
 def generate_report(exploitResult: dict, tokenizer: AutoTokenizer, model: AutoModelForCausalLM) -> str:
-    """
+     """
      Create the markdown report
      exploitResult: dictionary containing the exploit result
      tokenizer: tokenizer for the LLM
@@ -237,6 +237,7 @@ def generate_report(exploitResult: dict, tokenizer: AutoTokenizer, model: AutoMo
 def main():
      exploit = load_json("./seed/exploit/metasploitable.json")
      pretrained = "google/gemma-2b-it"
+     access_token = "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"
      tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
      model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
      result = generate_report(exploit, tokenizer, model)
