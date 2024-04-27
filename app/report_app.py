@@ -5,9 +5,11 @@ from json import loads
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import requests
 from time import sleep
+from dotenv import load_dotenv
 
 from report import generate_report
 
+load_dotenv()
 app = Flask(__name__)
 api_key = environ.get("api_key")
 if api_key is None:
