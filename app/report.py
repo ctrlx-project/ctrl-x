@@ -3,18 +3,16 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import time
 import requests
 import json
-from models import db, Exploit, Report, User, Scan
-from celery import shared_task
-from app import env, create_app
-from sys import stderr
+# from models import db, Exploit, Report, Scan
+# from celery import shared_task
+# from app import env, create_app
+# from sys import stderr
 
-access_token = env.ml_access_token
+# access_token = env.ml_access_token
 
-app = create_app()
-
-pretrained = "google/gemma-2b-it"
-tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
-model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
+# app = create_app()
+# celery_app = app.extensions["celery"]
+# celery_app.set_default()
 
 
 def load_json(filepath: str) -> dict:
@@ -178,75 +176,74 @@ def generate_report(exploitResult: dict, tokenizer: AutoTokenizer, model: AutoMo
      tokenizer: tokenizer for the LLM
      model: LLM model
      """
-    report = []
-    for IP in exploitResult.keys():
-        exploit_IP = exploitResult.get(IP)
-        report.append(f"# Penetration testing for {IP}\n\n")
-        for port in exploit_IP.keys():
-            exploit_port = exploit_IP.get(port)
-            report.append(f"## Port {port}\n")
-            shell_exploits = {}
-            failed_exploits = {}
-            for exploit in exploit_port.keys():
-                status = exploit_port[exploit].get("status")
-                if status and status == "ACQUIRED_SHELL":
-                    shell_exploits[exploit] = exploit_port[exploit]
-                else:
-                    failed_exploits[exploit] = exploit_port[exploit]
-            if len(shell_exploits) > 0:
-                report.append("### Vulnerabilities that we exploited to get a shell\n")
-                report.append(generate_section_report(shell_exploits, tokenizer, model))
-                report.append("\n")
-            if len(failed_exploits) > 0:
-                report.append("### Vulnerabilities that we are unable to exploit\n")
-                report.append(generate_section_report(failed_exploits, tokenizer, model))
-                report.append("\n")
-            print(f"Port {port} completed")
-            # return report
-    return "".join(report)
+     report = []
+     for IP in exploitResult.keys():
+          exploit_IP = exploitResult.get(IP)
+          report.append(f"# Penetration testing for {IP}\n\n")
+          for port in exploit_IP.keys():
+               exploit_port = exploit_IP.get(port)
+               report.append(f"## Port {port}\n")
+               shell_exploits = {}
+               failed_exploits = {}
+               for exploit in exploit_port.keys():
+                    status = exploit_port[exploit].get("status")
+                    if status and status == "ACQUIRED_SHELL":
+                         shell_exploits[exploit] = exploit_port[exploit]
+                    else:
+                         failed_exploits[exploit] = exploit_port[exploit]
+               if len(shell_exploits) > 0:
+                    report.append("### Vulnerabilities that we exploited to get a shell\n")
+                    report.append(generate_section_report(shell_exploits, tokenizer, model))
+                    report.append("\n")
+               if len(failed_exploits) > 0:
+                    report.append("### Vulnerabilities that we are unable to exploit\n")
+                    report.append(generate_section_report(failed_exploits, tokenizer, model))
+                    report.append("\n")
+               print(f"Port {port} completed")
+               # return report
+     return "".join(report)
 
-
-def report(exploit_id: int, scan_id: int) -> bool:
-    # Takes a report job and save the result into the database.
-    # Return boolean based on whether the job is completed.
-    if not (exploit_id or scan_id):
-        return False
-
-    with app.app_context():
-        exploit = Exploit.query.filter_by(id=exploit_id).first()
-        exploit_data = json.loads(exploit.exploit_data)
-        scan = Scan.query.filter_by(id=scan_id).first()
-        newReport = Report(ip=scan.ip, scan_id=scan, status="running")
-        db.session.add(newReport)
-        db.session.commit()
-    try:
-        report = generate_report(exploit_data, tokenizer, model)
-        with app.app_context():
-            newReport.status = "complete"
-            newReport.content = report
-            db.session.add(newReport)
-            db.session.commit()
-        return True
-    except Exception as e:
-        with app.app_context():
-            newReport.status = "failed"
-            db.session.add(newReport)
-            db.session.commit()
-        print(f"Error generating report for: {e}", file=stderr)
-        return False
+# @shared_task(ignore_result=False, name='report', autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
+# def report_job(exploit_id:int, scan_id:int) -> bool:
+#      # Takes a report job and save the result into the database.
+#      # Return boolean based on whether the job is completed.
+#      with app.app_context():
+#           exploit = Exploit.query.filter_by(id=exploit_id).first()
+#           exploit_data = json.loads(exploit.exploit_data)
+#           scan = Scan.query.filter_by(id=scan_id).first()
+#           newReport = Report(ip=scan.ip, scan_id=scan, status="running")
+#           db.session.add(newReport)
+#           db.session.commit()
+#      try:
+#           pretrained = "google/gemma-2b-it"
+#           tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
+#           model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
+#           report = generate_report(exploit_data, tokenizer, model)
+#           with app.app_context():
+#                newReport.status = "complete"
+#                newReport.content = report
+#                db.session.add(newReport)
+#                db.session.commit()
+#           return True
+#      except Exception as e:
+#           with app.app_context():
+#                newReport.status = "failed"
+#                db.session.add(newReport)
+#                db.session.commit()
+#           print(f"Error generating report for {ip}: {e}", file=stderr)
+#           return False
 
 
 def main():
-    exploit = load_json("./seed/exploit/metasploitable.json")
-    # pretrained = "google/gemma-2b-it"
-    # tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
-    # model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
-    result = generate_report(exploit, tokenizer, model)
-    outputFile = open("mlOutput.md", "w")
-    outputFile.write(result)
-    outputFile.close()
-    print("Finished")
-
+     exploit = load_json("./seed/exploit/metasploitable.json")
+     pretrained = "google/gemma-2b-it"
+     tokenizer = AutoTokenizer.from_pretrained(pretrained, token=access_token)
+     model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", token=access_token)
+     result = generate_report(exploit, tokenizer, model)
+     outputFile = open("mlOutput.md", "w")
+     outputFile.write(result)
+     outputFile.close()
+     print("Finished")
 
 if __name__ == "__main__":
     main()
