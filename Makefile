@@ -5,27 +5,26 @@ help:
 main_app:
 	$(MAKE) -C app app
 
-scannerd:
-	$(MAKE) -C app scannerd
+tasks:
+	$(MAKE) -C app tasks
 
 .PHONY: install
 install:
 	$(MAKE) -C app venv
+
+.PHONY: llm
+llm:
+	$(MAKE) -C app llm
 
 .PHONY: app
 app: install
 	$(MAKE) -C store start
 	$(MAKE) -C app app
 
-.PHONY: scannerd
-scannerd: install
-	$(MAKE) -C store start
-	$(MAKE) -C app scannerd
-
 .PHONY: dev
 dev: install
 	$(MAKE) -C store start
-	$(MAKE) -j main_app scannerd
+	$(MAKE) -j main_app tasks
 
 .PHONY: seed
 seed:

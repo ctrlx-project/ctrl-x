@@ -24,15 +24,21 @@ venv:
 		# ./venv/bin/activate; \
 	fi
 
+.PHONY: llm
+llm:
+	@if [ -d venv ]; then \
+		./venv/bin/pip install -r llm-req.txt; \
+	fi
+
 .PHONY: app
 app:
 	@echo "### Starting app"
 	./venv/bin/python3 main.py
 
-.PHONY: scannerd
+.PHONY: tasks
 scannerd:
 	@echo "### Starting scannerd"
-	sudo -E ./venv/bin/python3 -m celery -A scannerd.celery_app worker --loglevel INFO
+	sudo -E ./venv/bin/python3 -m celery -A tasks.celery_app worker --loglevel INFO
 
 .PHONY: seed
 seed: venv
