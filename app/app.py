@@ -105,3 +105,5 @@ def create_app() -> Flask:
 
 
     return app
+
+env.app = create_app()
