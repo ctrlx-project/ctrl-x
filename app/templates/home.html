@@ -32,24 +32,24 @@ Welcome to CTRL-X!
     <h3>Request New Job</h3>
 </div>
 <div class="d-flex flex-row justify-content-center">
-    <div class="d-flex flex-row w-25 steps justify-content-end">
-        <h3></h3>
-    </div>
-    <div class="card text-center homepage-card">
+    <div class="card text-center homepage-card w-25">
         <div class="card-body">
-            <p class="card-text">Request new jobs by inputting the target IP and optionally port(s).</p>
+            <p class="card-text">Request new jobs by inputting the target IP and optionally port(s).</p><br>
             <form id="ip-form">
-                <label for="ip_block">IP:</label><br>
-                <input type="text" class="form-control" id="ip_block" name="ip_block"><br>
-                <label for="ports">Ports (optional):</label><br>
-                <input type="text" class="form-control" id="ports" name="ports"><br> 
+                <div class="row">
+                    <div class="col">
+                        <label for="ip_block">Target IP Address:</label>
+                        <input type="text" class="form-control text-center" id="ip_block" name="ip_block"><br>
+                    </div>
+                    <div class="col">
+                        <label for="ports">Target Port(s) (optional):</label>
+                        <input type="text" class="form-control text-center" id="ports" name="ports"><br> 
+                    </div>
+                </div>
                 <input class="small-mt btn btn-primary" type="submit" value="Submit" onclick="location.reload();">
                 <p class="card-text" id="response" name="response"></p>
             </form>
         </div>
-    </div>
-    <div class="d-flex flex-row w-25 instruct justify-content-start">
-        <h3></h3>
     </div>
 </div>
 <div class="container">
