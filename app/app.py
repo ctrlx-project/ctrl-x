@@ -26,6 +26,9 @@ class Env:
     secret_key: str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
     ml_access_token: str = environ.get("ML_ACCESS_TOKEN", default="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")
     api_key: str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
+    msf_ip: str = environ.get("MSF_IP", default="127.0.0.1")
+    msf_port: str = environ.get("MSF_PORT", default="55552")
+    msf_password: str = environ.get("MSF_PASSWORD", default="password")
 
     # For scannerd
     task_ignore_result: bool = True
