@@ -32,7 +32,8 @@ model = AutoModelForCausalLM.from_pretrained(pretrained, device_map="auto", toke
 
 @app.route("/gen_report", methods=["POST"])
 def get_report():
-    if request.form.get("api_key") != api_key:
+    if request.headers.get("X-api-key") != api_key:
+        print(request.headers)
         return abort(401)
     try:
         report_id = request.form.get("report_id")
@@ -47,11 +48,12 @@ def return_report(report_id:int, exploit_data:dict)->None:
     while (environ.get("LOCKED") == "True"):
         sleep(3)
     environ["LOCKED"] = "True"
+    headers = {"X-api-key":api_key}
     try:
         result = generate_report(exploit_data, tokenizer, model)
-        requests.post(server, data={"report_id":report_id, "report":result, "status":"complete"})
+        requests.post(server, data={"report_id":report_id, "report":result, "status":"complete"}, headers=headers)
     except:
-        requests.post(server, data={"report_id":report_id, "status":"failed"})
+        requests.post(server, data={"report_id":report_id, "status":"failed"}, headers=headers)
     finally:
         environ["LOCKED"] = "False"
 

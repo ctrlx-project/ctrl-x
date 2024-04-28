@@ -36,7 +36,7 @@ def test_mq():
 
 @api.route('/scan-new', methods=['POST'])
 def _scan_():
-    if current_user.is_authenticated or env.api_key == request.headers.get("X-api_key"):
+    if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
         # Dispatch scan using block/FQDN. This passes the job to scanner
         ip_block = request.form.get('ip_block')
         if not ip_block:
@@ -52,7 +52,7 @@ def _scan_():
 @api.route('/scan', methods=['GET'])
 def scans():
     login = current_user.is_authenticated
-    if current_user.is_authenticated or env.api_key == request.headers.get("X-api_key"):
+    if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
         # if GET method, return all scans in database
         if request.method == 'GET':
             if ip := request.args.get('ip'):
@@ -78,7 +78,7 @@ def scans():
 
 @api.route('/report', methods=['GET'])
 def reports():
-    if current_user.is_authenticated or env.api_key == request.headers.get("X-api_key"):
+    if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
         # if GET method, return all reports in database
         if request.method == 'GET':
             result = Report.query.all()
@@ -94,7 +94,7 @@ def reports():
 
 @api.route('/settings', methods=['GET', 'POST'])
 def settings():
-    if current_user.is_authenticated or env.api_key == request.headers.get("X-api_key"):
+    if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
         # if GET request, then return current settings
         if request.method == 'GET':
             settings = Setting.query.all()
@@ -145,8 +145,9 @@ def settings():
 
 @api.route('/store_report', methods=['POST'])
 def store_report():
-    if env.api_key != request.headers.get("X-api_key"):
+    if env.api_key != request.headers.get("X-api-key"):
         return error_resp('Not open to public')
+    print(request.form)
     report_id = request.form.get("report_id")
     if not report_id:
         return error_resp('Missing report id')
@@ -158,8 +159,10 @@ def store_report():
         report.content = report_content
         db.session.add(report)
         db.session.commit()
+        print("Complete")
     else:
         report.status = "failed"
         db.session.add(report)
         db.session.commit()
-
+        print("Failed")
+    return success_resp("Success")

@@ -92,6 +92,4 @@ def report(exploit_id:int, scan_id:int) -> bool:
         return False
     while newReport.status == "running":
         sleep(3)
-    if newReport.status == "failed":
-        return False
-    return True
+    return newReport.status == "complete"
