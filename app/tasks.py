@@ -1,18 +1,15 @@
 from app import create_app
 from utils import resolve_ip_block, success_resp
 from celery import shared_task, chain
+import requests
+from json import dumps
+from time import sleep
 
 from scanner import test_scanner, scanner
 from parse_scan import parse_scan
 from exploit import exploit
+from models import Report, Scan, Exploit, db
 
-try:
-    from report import report
-except Exception:
-    skip_report = True
-    print("#########################################################")
-    print("### LLM requirements not met. Skipping report generation.")
-    print("#########################################################")
 
 app = create_app()
 celery_app = app.extensions["celery"]
@@ -58,8 +55,6 @@ def report_job(argv):
     Generate a report using the parsed scan data
     Returns: Bool
     """
-    if skip_report:
-        return False
     exploit_id, scan_id = argv
     return report(exploit_id, scan_id)
 
@@ -78,3 +73,18 @@ def dispatch_scan(ip_block: str):
         chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
 
     return success_resp(f'{len(ip_list)} scan job(s) dispatched.')
+
+def report(exploit_id:int, scan_id:int) -> bool:
+    exploit = Exploit.query.filter_by(id=exploit_id).first()
+    scan = Scan.query.filter_by(id=scan_id).first()
+    newReport = Report(ip=scan.ip, scan_id=scan, status="running")
+    db.session.add(newReport)
+    db.session.commit()
+    payload = {"api_key":env.api_key, "report_id":newReport.id, "exploit_data": dumps(exploit.exploit_data)}
+    r = requests.post("llm-api.onosiris.io/gen_report", data=payload)
+    if r.status != 200 or r.json().get("status") != "running":
+        newReport.status = "failed"
+        return False
+    while newReport.status == "running":
+        sleep(3)
+    return newReport.status == "complete"
