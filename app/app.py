@@ -46,7 +46,7 @@ class Env:
             try:
                 self.update()
             except Exception:
-                print(f"Error updating settings", file=stderr)
+                pass # print(f"Error updating settings", file=stderr)
             finally:
                 sleep(3)
 

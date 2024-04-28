@@ -39,7 +39,7 @@ def scanner(ip: str):
         print(f"Error scanning {ip}: {e}", file=stderr)
         return None
 
-def simple_scan(ip) -> Never:
+def simple_scan(ip):
     """
     Takes in ip in the format a.b.c.d/CIDR, a.b.c.d, or domain name; or id of scheduled scan job
     Args:
