@@ -24,10 +24,10 @@ def test_api_scan():
     with app.test_client() as test_client:
         response = test_client.get('api/scan')
         res_body = json.loads(response.data.decode('utf-8'))
-        assert response.status_code == 200 and res_body != {}
+        assert response.status_code == 200 and res_body[0]['scan_data']['nmap']
 
 def test_api_scan_new():
     with app.test_client() as test_client:
         response = test_client.post('api/scan-new', data = {'ip_block': '0.0.0.0'})
         res_body = json.loads(response.data.decode('utf-8'))
-        assert response.status_code == 200 and res_body["status"] != "error"
+        assert response.status_code == 200 and res_body["message"] == "Scan job dispatched"
