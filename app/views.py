@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, Markup, abort
+from pymetasploit3.msfrpc import MsfRpcClient
 from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Report, Setting
 from utils import error_resp, success_resp
+from app import env
 import re
 import os
 import markdown
@@ -204,3 +206,27 @@ def list_reports():
     if len(ret) == 0:
         message = "You have not done any scan"
     return render_template('report_list.html', report_names=ret, message=message, login=login)
+
+@index.route("/shells")
+def list_shells():
+    """Renders a webpage with a list of shells"""
+    login = current_user.is_authenticated
+    if not login:
+        return abort(401)
+    msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+    shells = msf_manager.sessions.list
+    ret = []
+    for shell_id, shell in shells.items():
+        ret.append((shell_id,
+                   shell['target_host'],
+                   shell['session_port'],
+                   shell['type'],
+                   shell['arch'],
+                   shell['desc'],
+                   shell['via_exploit'],
+                   shell['via_payload']))
+    message = ""
+    if len(ret) == 0:
+        message = "You have not done any scan"
+    return render_template('shell_list.html', shell_index=ret, message=message, login=login)
+

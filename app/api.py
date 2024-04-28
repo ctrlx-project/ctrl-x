@@ -6,6 +6,7 @@ from celery.result import AsyncResult
 from time import sleep
 from app import create_app, env
 from flask_login import current_user
+from pymetasploit3.msfrpc import MsfRpcClient
 
 from tasks import dispatch_scan, test_mq
 
@@ -75,7 +76,6 @@ def scans():
     else:
         return error_resp('Must be authenticated to see scans')
 
-
 @api.route('/report', methods=['GET'])
 def reports():
     if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
@@ -90,6 +90,20 @@ def reports():
                 return error_resp("No reports yet!")
     else:
         return error_resp('Must be authenticated to see reports')
+
+@api.route('/shells', methods=['GET'])
+def shells():
+    if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
+        # If GET method, return all shells
+        if request.method == 'GET':
+            msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+            result = msf_manager.sessions.list
+            if result:
+                return jsonify(result)
+            else:
+                return error_resp("No shells yet!")
+    else:
+        return error_resp('Must be authenticated to see shells')
 
 
 @api.route('/settings', methods=['GET', 'POST'])

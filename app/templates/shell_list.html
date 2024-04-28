@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Shell
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Session ID</th>
+                <th scope="col">Target IP</th>
+                <th scope="col">Target Port</th>
+                <th scope="col">Type</th>
+                <th scope="col">Architecture</th>
+                <th scope="col">Description</th>
+                <th scope="col">Exploit Used</th>
+                <th scope="col">Payload Used</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for index in shell_index%}
+                <tr>
+                    <td>
+                        <a class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="/shells/{{index[0]}}">
+                            {{index[0]}}
+                        </a>
+                    </td>
+                    <td>{{index[1]}}</td>
+                    <td>{{index[2]}}</td>
+                    <td>{{index[3]}}</td>
+                    <td>{{index[4]}}</td>
+                    <td>{{index[5]}}</td>
+                    <td>{{index[6]}}</td>
+                    <td>{{index[7]}}</td>
+                    <td>{{index[8]}}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block imports %}
+
+{% endblock %}

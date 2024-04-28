@@ -9,6 +9,8 @@ function main() {
 
   const report_url = "/reports/";
 
+  const shell_url = "/shells/";
+
   // test api call
   // $.ajax({
   //     url: testurl,
@@ -31,6 +33,15 @@ function main() {
     },
   });
 
+  //api call for shells
+  $.ajax({
+    url: shell_url,
+    type: "GET",
+    success: (shells) => {
+      shell_list = shells;
+    },
+  });
+
   // api call for all ips
   $.ajax({
     url: scanapiurl,
@@ -38,28 +49,28 @@ function main() {
     success: (scan1) => {
       let count = 1;
       scan1.forEach((scan) => {
-        let coressponding_report;
+        let corresponding_report;
         report_list.forEach((report) => {
           if (report.scan_id == scan.id) {
-            coressponding_report = report.id;
+            corresponding_report = report.id;
           }
         });
-        populateCard(scan, count, coressponding_report);
+        populateCard(scan, count, corresponding_report);
         count += 1;
       });
     },
   });
 
-  function populateCard(scan_data, count, coressponding_report) {
+  function populateCard(scan_data, count, corresponding_report) {
     //create new Card
     //add text elements that display ip: ...,
     //console.log("hi");
-    if (coressponding_report) {
+    if (corresponding_report) {
       if (scan_data.status == "complete") {
         $("#ip-container").append(
           `<tr>` +
             `<th scope="row">${count}</th>` +
-            `<td><a href=${report_url + coressponding_report}>${
+            `<td><a href=${report_url + corresponding_report}>${
               scan_data.ip
             }</a></td>` +
             `<td>${scan_data.start_time}</td>` +
@@ -73,7 +84,7 @@ function main() {
         $("#ip-container").append(
           `<tr>` +
             `<th scope="row">${count}</th>` +
-            `<td><a href=${report_url + coressponding_report}>${
+            `<td><a href=${report_url + corresponding_report}>${
               scan_data.ip
             }</a></td>` +
             `<td>${scan_data.start_time}</td>` +
@@ -108,4 +119,4 @@ function main() {
       }
     }
   }
-}
+
