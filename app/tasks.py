@@ -30,7 +30,6 @@ def scan_job(ip: str):
     Scans a single IP address
     Returns: scan_id
     """
-    print("scanner")
     return scanner(ip)
 
 
