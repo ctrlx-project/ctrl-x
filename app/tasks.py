@@ -1,4 +1,4 @@
-from app import create_app
+from app import create_app, env
 from utils import resolve_ip_block, success_resp
 from celery import shared_task, chain
 import requests
@@ -77,11 +77,12 @@ def dispatch_scan(ip_block: str, ports: str=''):
 def report(exploit_id:int, scan_id:int) -> bool:
     exploit = Exploit.query.filter_by(id=exploit_id).first()
     scan = Scan.query.filter_by(id=scan_id).first()
-    newReport = Report(ip=scan.ip, scan_id=scan, status="running")
+    newReport = Report(ip=scan.ip, scan=scan, status="running")
     db.session.add(newReport)
     db.session.commit()
+    header = {'X-api-key': env.api_key}
     payload = {"api_key":env.api_key, "report_id":newReport.id, "exploit_data": dumps(exploit.exploit_data)}
-    r = requests.post("llm-api.onosiris.io/gen_report", data=payload)
+    r = requests.post("https://llm-api.onosiris.io/gen_report", data=payload, headers=header)
     if r.status != 200 or r.json().get("status") != "running":
         newReport.status = "failed"
         return False
