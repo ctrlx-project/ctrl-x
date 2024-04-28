@@ -1,0 +1,25 @@
+<!-- Include Socket.IO -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+
+<!-- Your HTML code -->
+<body>
+    <input type="text" id="commandInput" placeholder="Enter command...">
+    <button onclick="sendCommand()">Execute</button>
+    <pre id="output"></pre>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Establish Socket.IO connection
+            var socket = io.connect('https://' + document.domain + ':' + location.port);
+
+            function sendCommand() {
+                var commandInput = document.getElementById('commandInput').value;
+                socket.emit('input_command', commandInput);
+            }
+
+            socket.on('output_response', function(data) {
+                document.getElementById('output').textContent = data.output;
+            });
+        });
+    </script>
+</body>

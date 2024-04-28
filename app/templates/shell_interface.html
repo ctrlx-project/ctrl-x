@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Shell Interface
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h2>Shell Interface</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="command" class="form-label">Execute new command:</label>
+            <input type="text" class="form-control" id="command" name="command" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Execute</button>
+    </form>
+    <div class="container">
+        <hr class="hr-blurry" />
+    </div>
+    {% if command %}
+    <h3 class="mt-4">Command Executed:</h4>
+    <p>{{ command }}</p>
+    {% endif %}
+    {% if output %}
+    <h3 class="mt-4">Output:</h4>
+    <pre>{{ output }}</pre>
+    {% endif %}
+</div>
+{% endblock %}

@@ -35,6 +35,18 @@ class Exploit(db.Model):
     start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     end_time = db.Column(db.DateTime)
     status = db.Column(db.String(15))
+    
+    @property
+    def info(self):
+        return {
+            'id': self.id,
+            'ip': self.ip,
+            'exploit_data': self.exploit_data,
+            'exploit_result': json.dumps(self.exploit_data, indent=2),
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'status': self.status,
+        }
 
 
 class Parsed(db.Model):

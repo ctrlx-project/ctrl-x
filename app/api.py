@@ -1,11 +1,14 @@
 from flask import Blueprint, request, escape, jsonify, render_template
-from models import db, Scan, Report, Setting
+from models import db, Scan, Report, Setting, Exploit
 from utils import success_resp, error_resp, validate_scan_job
+import requests
 
 from celery.result import AsyncResult
 from time import sleep
 from app import create_app, env
 from flask_login import current_user
+from pymetasploit3.msfrpc import MsfRpcClient, MsfAuthError
+
 
 from tasks import dispatch_scan, test_mq
 
@@ -17,6 +20,7 @@ app = create_app()
 @api.route('/')
 def _api():
     return success_resp("API is running")
+
 
 
 @api.route('/test-scan')
@@ -39,10 +43,11 @@ def _scan_():
     if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
         # Dispatch scan using block/FQDN. This passes the job to scanner
         ip_block = request.form.get('ip_block')
+        ports = request.form.get('ports')
         if not ip_block:
             return error_resp('IP/IP-block/FQDN is required')
         if ip_block := validate_scan_job(ip_block):
-            return dispatch_scan(ip_block)
+            return dispatch_scan(ip_block, ports)
         else:
             return error_resp('Invalid IP/FQDN')
     else:
@@ -75,6 +80,31 @@ def scans():
     else:
         return error_resp('Must be authenticated to see scans')
 
+@api.route('/exploit', methods=['GET'])
+def exploits():
+    login = current_user.is_authenticated
+    if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
+        # if GET method, return all exploits in database
+        if request.method == 'GET':
+            if ip := request.args.get('ip'):
+                request_ip = str(escape(ip))
+                result = Exploit.query.filter(Scan.ip == request_ip)
+                if result:
+                    ret = [exploit.info for exploit in result]
+                    p_list = sorted(ret, key=lambda x: x['start_time'])
+                    return render_template("exploit.html", exploit_list=p_list, login=login)
+                else:
+                    return error_resp(f"Exploit with ip {request_ip} not found.")
+            else:
+                result = Exploit.query.all()
+                if result:
+                    ret = [exploit.info for exploit in result]
+                    p_list = sorted(ret, key=lambda x: x['start_time'])
+                    return jsonify(p_list)
+                else:
+                    return error_resp("No exploits yet!")
+    else:
+        return error_resp('Must be authenticated to see exploits')
 
 @api.route('/report', methods=['GET'])
 def reports():
@@ -90,6 +120,23 @@ def reports():
                 return error_resp("No reports yet!")
     else:
         return error_resp('Must be authenticated to see reports')
+
+@api.route('/shells', methods=['GET'])
+def shells():
+    if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
+        # If GET method, return all shells
+        if request.method == 'GET':
+            try:
+                msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+                result = msf_manager.sessions.list
+            except MsfAuthError:
+                return error_resp("MsfRPC server is offline.")
+            if result:
+                return jsonify(result)
+            else:
+                return error_resp("No shells yet!")
+    else:
+        return error_resp('Must be authenticated to see shells')
 
 
 @api.route('/settings', methods=['GET', 'POST'])

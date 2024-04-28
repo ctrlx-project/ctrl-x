@@ -22,12 +22,12 @@ def test_mq(message):
 
 
 @shared_task(ignore_result=False, name='scan')
-def scan_job(ip: str):
+def scan_job(ip: str, ports: str=''):
     """
     Scans a single IP address
     Returns: scan_id
     """
-    return scanner(ip)
+    return scanner(ip, ports)
 
 
 @shared_task(ignore_result=False, name='parse_scan')
@@ -59,7 +59,7 @@ def report_job(argv):
     return report(exploit_id, scan_id)
 
 
-def dispatch_scan(ip_block: str):
+def dispatch_scan(ip_block: str, ports: str=''):
     """
     Takes in ip in the format a.b.c.d/CIDR, a.b.c.d, or domain name
     Args:
@@ -70,7 +70,7 @@ def dispatch_scan(ip_block: str):
 
     ip_list = resolve_ip_block(ip_block)
     for ip in ip_list:
-        chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
+        chain(scan_job.s(ip, ports), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
 
     return success_resp(f'{len(ip_list)} scan job(s) dispatched.')
 
