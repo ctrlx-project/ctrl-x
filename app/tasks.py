@@ -1,5 +1,5 @@
-from app import env, create_app
-from utils import resolve_ip_block
+from app import create_app
+from utils import resolve_ip_block, success_resp
 from celery import shared_task, chain
 import requests
 from json import dumps
@@ -27,7 +27,6 @@ def scan_job(ip: str):
     Scans a single IP address
     Returns: scan_id
     """
-    print("scanner")
     return scanner(ip)
 
 
@@ -70,14 +69,10 @@ def dispatch_scan(ip_block: str):
     """
 
     ip_list = resolve_ip_block(ip_block)
-    print(ip_list)
     for ip in ip_list:
         chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
 
-    return {
-        'status': 'success',
-        'message': f'{len(ip_list)} scan job(s) dispatched.'
-    }
+    return success_resp(f'{len(ip_list)} scan job(s) dispatched.')
 
 def report(exploit_id:int, scan_id:int) -> bool:
     exploit = Exploit.query.filter_by(id=exploit_id).first()
