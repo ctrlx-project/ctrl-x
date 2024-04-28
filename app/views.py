@@ -47,6 +47,14 @@ def show_scans():
     else:
         return error_resp('Must be logged in to see scans')
 
+@index.route('/exploits')
+def show_exploits():
+    login = current_user.is_authenticated
+    if login:
+        return render_template('general_exploits.html', login=login)
+    else:
+        return error_resp('Must be logged in to see scans')
+
 @index.route('/login')
 def login():
     login = current_user.is_authenticated
@@ -247,7 +255,11 @@ def execute_command():
     shell_id = request.json.get('shell_id')
 
     # Retrieve the shell session by ID
-    shell = get_shell_session_by_id(shell_id)
+    try:
+        msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+        return msf_manager.sessions.session(session_id)
+    except (MsfAuthError, requests.exceptions.ConnectionError):
+        return None
 
     if not shell:
         return jsonify({'error': 'Shell session with ID {} not found.'.format(shell_id)}), 404

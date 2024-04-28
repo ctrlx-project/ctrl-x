@@ -1,5 +1,5 @@
 from flask import Blueprint, request, escape, jsonify, render_template
-from models import db, Scan, Report, Setting
+from models import db, Scan, Report, Setting, Exploit
 from utils import success_resp, error_resp, validate_scan_job
 import requests
 
@@ -79,6 +79,32 @@ def scans():
                     return error_resp("No scans yet!")
     else:
         return error_resp('Must be authenticated to see scans')
+
+@api.route('/exploit', methods=['GET'])
+def exploits():
+    login = current_user.is_authenticated
+    if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
+        # if GET method, return all exploits in database
+        if request.method == 'GET':
+            if ip := request.args.get('ip'):
+                request_ip = str(escape(ip))
+                result = Exploit.query.filter(Scan.ip == request_ip)
+                if result:
+                    ret = [exploit.info for exploit in result]
+                    p_list = sorted(ret, key=lambda x: x['start_time'])
+                    return render_template("exploit.html", exploit_list=p_list, login=login)
+                else:
+                    return error_resp(f"Exploit with ip {request_ip} not found.")
+            else:
+                result = Exploit.query.all()
+                if result:
+                    ret = [exploit.info for exploit in result]
+                    p_list = sorted(ret, key=lambda x: x['start_time'])
+                    return jsonify(p_list)
+                else:
+                    return error_resp("No exploits yet!")
+    else:
+        return error_resp('Must be authenticated to see exploits')
 
 @api.route('/report', methods=['GET'])
 def reports():
