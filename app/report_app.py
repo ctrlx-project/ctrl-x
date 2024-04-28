@@ -38,22 +38,22 @@ def get_report():
     try:
         report_id = request.form.get("report_id")
         exploit_data = loads(request.form.get("exploit_data"))
-        report_generation = mp.Process(target=return_report, args=(report_id, exploit_data))
+        report_generation = mp.Process(target=return_report, args=(report_id, exploit_data, request.remote_addr))
         report_generation.start()
         return {"status":"runnning"}
     except Exception as e:
         return {"status":"failed", "error":str(e)}
 
-def return_report(report_id:int, exploit_data:dict)->None:
+def return_report(report_id:int, exploit_data:dict, ip:str)->None:
     while (environ.get("LOCKED") == "True"):
         sleep(3)
     environ["LOCKED"] = "True"
     headers = {"X-api-key":api_key}
     try:
         result = generate_report(exploit_data, tokenizer, model)
-        requests.post(server, data={"report_id":report_id, "report":result, "status":"complete"}, headers=headers)
+        requests.post(ip, data={"report_id":report_id, "report":result, "status":"complete"}, headers=headers)
     except:
-        requests.post(server, data={"report_id":report_id, "status":"failed"}, headers=headers)
+        requests.post(ip, data={"report_id":report_id, "status":"failed"}, headers=headers)
     finally:
         environ["LOCKED"] = "False"
 
