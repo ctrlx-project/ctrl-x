@@ -19,7 +19,7 @@ if access_token is None:
     access_token = "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"
 server = environ.get("server")
 if server is None:
-    server = "http://127.0.0.1:5000/"
+    server = "http://127.0.0.1:5000/api/store_report"
 environ["LOCKED"] = "False"
 try:
    mp.set_start_method('spawn', force=True)
