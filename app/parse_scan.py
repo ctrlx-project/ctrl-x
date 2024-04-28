@@ -123,7 +123,7 @@ def parse_scan(scan_id: str):
 
         # Creates the Parsed object in the database
         loaded_scan = saved_scan.scan_data
-        ip = next(iter(loaded_scan["scan"]))
+        ip = saved_scan.ip
 
         parsed_scan = Parsed(ip=ip)
         db.session.add(parsed_scan)
