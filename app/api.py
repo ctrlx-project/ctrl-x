@@ -1,12 +1,14 @@
 from flask import Blueprint, request, escape, jsonify, render_template
 from models import db, Scan, Report, Setting
 from utils import success_resp, error_resp, validate_scan_job
+import requests
 
 from celery.result import AsyncResult
 from time import sleep
 from app import create_app, env
 from flask_login import current_user
 from pymetasploit3.msfrpc import MsfRpcClient, MsfAuthError
+
 
 from tasks import dispatch_scan, test_mq
 
@@ -18,6 +20,7 @@ app = create_app()
 @api.route('/')
 def _api():
     return success_resp("API is running")
+
 
 
 @api.route('/test-scan')

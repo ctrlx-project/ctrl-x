@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, Markup, abort
+from flask_socketio import SocketIO, emit
 from pymetasploit3.msfrpc import MsfRpcClient, MsfAuthError
 from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Report, Setting
 from utils import error_resp, success_resp
-from app import env
+from app import env, create_app
 import re
 import os
 import markdown
@@ -12,6 +13,9 @@ import requests
 
 index = Blueprint('index', __name__, static_folder='static', template_folder='templates')
 
+app = create_app()
+
+socketio = SocketIO()
 
 @index.route('/', methods=['GET','POST'])
 def home():
@@ -192,6 +196,7 @@ def show_report(id):
     report_html = Markup(report_html)
     return render_template('report.html', report=report_html, login=login)
 
+
 @index.route("/reports")
 def list_reports():
     """Renders a webpage with a list of reports"""
@@ -232,4 +237,51 @@ def list_shells():
     if len(ret) == 0:
         message = "You have not done any scan"
     return render_template('shell_list.html', shell_index=ret, message=message, login=login)
+
+
+# Route to handle commands sent from the frontend
+@app.route('/execute_command', methods=['POST'])
+def execute_command():
+    # Retrieve the command and shell ID from the request
+    command = request.json.get('command')
+    shell_id = request.json.get('shell_id')
+
+    # Retrieve the shell session by ID
+    shell = get_shell_session_by_id(shell_id)
+
+    if not shell:
+        return jsonify({'error': 'Shell session with ID {} not found.'.format(shell_id)}), 404
+
+    # Write the command to the shell and read the output
+    shell.write(command)
+    output = shell.read()
+
+    return jsonify({'output': output.strip()})
+
+
+@index.route('/shells/<id>')
+def show_shell(id):
+    """
+    Renders a webpage where you can interact with the shell
+    with the specified id.
+    
+    args:
+        id: The id field of the report in the database
+    """
+    login = current_user.is_authenticated
+    try:
+        msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+        shell = msf_manager.sessions.session(id)
+    except (MsfAuthError, requests.exceptions.ConnectionError):
+        return error_resp("MsfRPC server is offline.")
+    if not shell:
+        return abort(404)
+
+    @socketio.on('input_command')
+    def handle_input_command(command):
+        shell.write(command)
+        emit('output_response', {'output': shell.read()})
+
+    return render_template('shell.html')
+
 
