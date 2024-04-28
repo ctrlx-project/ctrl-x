@@ -14,6 +14,8 @@ import threading
 from time import sleep
 from datetime import timedelta
 
+app = None
+
 
 @dataclass
 class Env:
@@ -21,11 +23,9 @@ class Env:
     scannerd_url: str = environ.get("SCANNERD_URL", default="http://localhost:8000")
     broker_url: str = environ.get("RABBITMQ_URL", default="amqp://admin:admin@localhost:5672")
     result_backend: str = environ.get("POSTGRES_URL", default="db+postgresql://admin:admin@localhost:5432/ctrl-x")
-    secret_key:str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
-    ml_access_token:str = environ.get("ML_ACCESS_TOKEN", default="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")
-    api_key:str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
-
-    app = None
+    secret_key: str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
+    ml_access_token: str = environ.get("ML_ACCESS_TOKEN", default="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")
+    api_key: str = environ.get("SECRET_KEY", default="dingdongbingbongbangdangpfchans")
 
     # For scannerd
     task_ignore_result: bool = True
@@ -36,7 +36,7 @@ class Env:
     stop_event = threading.Event()
 
     def update(self):  # Updates setting values from the database
-        with self.app.app_context():
+        with app.app_context():
             self.nmap_scan_args = Setting.query.filter_by(key='nmap_scan_args').first().value or self.nmap_scan_args
             self.resolver.nameservers = [Setting.query.filter_by(key='nameserver').first().value,
                                          '8.8.8.8'] or self.resolver.nameservers
@@ -45,8 +45,8 @@ class Env:
         while not self.stop_event.is_set():
             try:
                 self.update()
-            except Exception as e:
-                print(f"Error updating settings: {e}", file=stderr)
+            except Exception:
+                print(f"Error updating settings", file=stderr)
             finally:
                 sleep(3)
 
@@ -74,7 +74,7 @@ def create_app() -> Flask:
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = env.postgres_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SQLALCHEMY_ECHO"] = False    
+    app.config["SQLALCHEMY_ECHO"] = False
     app.config['SECRET_KEY'] = env.secret_key
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
@@ -103,5 +103,7 @@ def create_app() -> Flask:
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-
     return app
+
+
+app = create_app()
