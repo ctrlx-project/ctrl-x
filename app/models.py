@@ -31,9 +31,9 @@ class Exploit(db.Model):
     __tablename__ = 'exploits'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ip = db.Column(db.String(16), nullable=False)
-    exploit_data = db.Column(db.JSON, nullable=False)
+    exploit_data = db.Column(db.JSON)
     start_time = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
-    end_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime)
     status = db.Column(db.String(15))
 
 
