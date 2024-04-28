@@ -10,7 +10,6 @@ Flask-Migrate~=4.0.5
 gunicorn
 celery
 flask_login
-Flask-SocketIO
 werkzeug
 markdown
 python-dotenv
