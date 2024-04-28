@@ -6,7 +6,7 @@ from celery.result import AsyncResult
 from time import sleep
 from app import create_app, env
 from flask_login import current_user
-from pymetasploit3.msfrpc import MsfRpcClient
+from pymetasploit3.msfrpc import MsfRpcClient, MsfAuthError
 
 from tasks import dispatch_scan, test_mq
 
@@ -96,8 +96,11 @@ def shells():
     if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
         # If GET method, return all shells
         if request.method == 'GET':
-            msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
-            result = msf_manager.sessions.list
+            try:
+                msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+                result = msf_manager.sessions.list
+            except MsfAuthError:
+                return error_resp("MsfRPC server is offline.")
             if result:
                 return jsonify(result)
             else:

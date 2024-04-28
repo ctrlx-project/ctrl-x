@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, Markup, abort
-from pymetasploit3.msfrpc import MsfRpcClient
+from pymetasploit3.msfrpc import MsfRpcClient, MsfAuthError
 from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Report, Setting
@@ -213,8 +213,11 @@ def list_shells():
     login = current_user.is_authenticated
     if not login:
         return abort(401)
-    msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
-    shells = msf_manager.sessions.list
+    try:
+        msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+        shells = msf_manager.sessions.list
+    except (MsfAuthError, requests.exceptions.ConnectionError):
+        return error_resp("MsfRPC server is offline.")
     ret = []
     for shell_id, shell in shells.items():
         ret.append((shell_id,
