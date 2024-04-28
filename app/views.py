@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, Markup, abort
-from flask_socketio import SocketIO, emit
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
 from pymetasploit3.msfrpc import MsfRpcClient, MsfAuthError
 from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,8 +13,6 @@ import requests
 index = Blueprint('index', __name__, static_folder='static', template_folder='templates')
 
 app = create_app()
-
-socketio = SocketIO()
 
 @index.route('/', methods=['GET','POST'])
 def home():
@@ -246,41 +243,14 @@ def list_shells():
         message = "You have not done any scan"
     return render_template('shell_list.html', shell_index=ret, message=message, login=login)
 
-
-# Route to handle commands sent from the frontend
-@app.route('/execute_command', methods=['POST'])
-def execute_command():
-    # Retrieve the command and shell ID from the request
-    command = request.json.get('command')
-    shell_id = request.json.get('shell_id')
-
-    # Retrieve the shell session by ID
-    try:
-        msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
-        return msf_manager.sessions.session(session_id)
-    except (MsfAuthError, requests.exceptions.ConnectionError):
-        return None
-
-    if not shell:
-        return jsonify({'error': 'Shell session with ID {} not found.'.format(shell_id)}), 404
-
-    # Write the command to the shell and read the output
-    shell.write(command)
-    output = shell.read()
-
-    return jsonify({'output': output.strip()})
-
-
-@index.route('/shells/<id>')
-def show_shell(id):
-    """
-    Renders a webpage where you can interact with the shell
-    with the specified id.
-    
-    args:
-        id: The id field of the report in the database
-    """
+@index.route('/shells/<id>', methods=['GET', 'POST'])
+def shell_interface(id):
+    """Renders a webpage where users can interact with the shell with the specified id."""
     login = current_user.is_authenticated
+
+    if not login:
+        return error_resp('Must be logged in to see scans')
+
     try:
         msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
         shell = msf_manager.sessions.session(id)
@@ -289,11 +259,37 @@ def show_shell(id):
     if not shell:
         return abort(404)
 
-    @socketio.on('input_command')
-    def handle_input_command(command):
+    if request.method == 'POST':
+        command = request.form.get('command')
         shell.write(command)
-        emit('output_response', {'output': shell.read()})
+        output = shell.read()
+        return render_template('shell_interface.html', command=command, output=output, login=login)
 
-    return render_template('shell.html')
+    return render_template('shell_interface.html', login=login)
 
+
+@index.route('/execute_command', methods=['POST'])
+def execute_command():
+    """Executes the command on the shell with the specified id."""
+    command = request.form.get('command')
+    shell_id = request.args.get('shell_id')
+
+    if not (command and shell_id):
+        return jsonify({'error': 'Command and shell ID are required.'}), 400
+
+    try:
+        msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+        shell = msf_manager.sessions.session(shell_id)
+    except (MsfAuthError, requests.exceptions.ConnectionError):
+        return jsonify({'error': 'Failed to connect to Metasploit RPC server.'}), 500
+
+    if not shell:
+        return jsonify({'error': 'Shell session with ID {} not found.'.format(shell_id)}), 404
+
+    try:
+        shell.write(command)
+        output = shell.read()
+        return jsonify({'output': output.strip()})
+    except Exception as e:
+        return jsonify({'error': 'An error occurred while executing the command: {}'.format(str(e))}), 500
 
