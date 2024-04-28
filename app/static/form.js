@@ -12,9 +12,12 @@ $(document).ready(function () {
       encode: true,
     }).done(function (data) {
       //console.log(data);
+      alert(data.message)
       $("#response").html(`<p>${data.message}</p>`);
     });
 
     event.preventDefault();
   });
+
+  $("")
 });
