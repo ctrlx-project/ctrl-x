@@ -1,7 +1,11 @@
 $(document).ready(function () {
   $("#ip-form").submit(function (event) {
+    var ip = $("#ip_block").val();
+    var ports = $("#ports").val();
+
     var formData = {
-      ip_block: $("#ip_block").val(),
+      ip_block: ip,
+      ports: ports
     };
 
     $.ajax({
@@ -11,7 +15,6 @@ $(document).ready(function () {
       dataType: "json",
       encode: true,
     }).done(function (data) {
-      //console.log(data);
       $("#response").html(`<p>${data.message}</p>`);
     });
 

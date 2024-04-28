@@ -43,10 +43,11 @@ def _scan_():
     if current_user.is_authenticated or env.api_key == request.headers.get("X-api-key"):
         # Dispatch scan using block/FQDN. This passes the job to scanner
         ip_block = request.form.get('ip_block')
+        ports = request.form.get('ports')
         if not ip_block:
             return error_resp('IP/IP-block/FQDN is required')
         if ip_block := validate_scan_job(ip_block):
-            return dispatch_scan(ip_block)
+            return dispatch_scan(ip_block, ports)
         else:
             return error_resp('Invalid IP/FQDN')
     else:

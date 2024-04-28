@@ -15,7 +15,7 @@ app = create_app()
 def test_scanner(message):
     return "Pong" if message == "Ping" else "Failed"
 
-def scanner(ip: str):
+def scanner(ip: str, ports: str=''):
     with app.app_context():
         scan_ = Scan(ip=ip)
         scan_.status = 'running'
@@ -23,7 +23,7 @@ def scanner(ip: str):
         db.session.commit()
 
     try:
-        scan_data = simple_scan(ip)
+        scan_data = simple_scan(ip, ports)
         with app.app_context():
             scan_.scan_data = scan_data
             scan_.status = 'complete'
@@ -39,7 +39,7 @@ def scanner(ip: str):
         print(f"Error scanning {ip}: {e}", file=stderr)
         return None
 
-def simple_scan(ip):
+def simple_scan(ip: str, ports: str=''):
     """
     Takes in ip in the format a.b.c.d/CIDR, a.b.c.d, or domain name; or id of scheduled scan job
     Args:
@@ -48,7 +48,8 @@ def simple_scan(ip):
         dict: Scan data
     """
     nm = nmap.PortScanner()
-    nm.scan(ip, arguments=env.nmap_scan_args)
+    arguments = f'{env.nmap_scan_args} -p {ports}' if ports else env.nmap_scan_args
+    nm.scan(ip, arguments=arguments)
     return nm.analyse_nmap_xml_scan()
 
 def main():
