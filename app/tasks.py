@@ -83,7 +83,7 @@ def report(exploit_id:int, scan_id:int) -> bool:
     header = {'X-api-key': env.api_key}
     payload = {"api_key":env.api_key, "report_id":newReport.id, "exploit_data": dumps(exploit.exploit_data)}
     r = requests.post("https://llm-api.onosiris.io/gen_report", data=payload, headers=header)
-    if r.status != 200 or r.json().get("status") != "running":
+    if r.status_code != 200 or r.json().get("status") != "running":
         newReport.status = "failed"
         return False
     while newReport.status == "running":
