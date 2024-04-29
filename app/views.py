@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort, Markup
 from pymetasploit3.msfrpc import MsfRpcClient, MsfAuthError
 from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
