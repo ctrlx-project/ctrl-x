@@ -15,9 +15,13 @@ $(document).ready(function () {
       dataType: "json",
       encode: true,
     }).done(function (data) {
+      //console.log(data);
+      alert(data.message)
       $("#response").html(`<p>${data.message}</p>`);
     });
 
     event.preventDefault();
   });
+
+  $("")
 });
