@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, Markup, abort
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, abort
+from pymetasploit3.msfrpc import MsfRpcClient, MsfAuthError
 from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Report, Setting
 from utils import error_resp, success_resp
+from app import env, create_app
 import re
 import os
 import markdown
@@ -10,6 +12,7 @@ import requests
 
 index = Blueprint('index', __name__, static_folder='static', template_folder='templates')
 
+app = create_app()
 
 @index.route('/', methods=['GET','POST'])
 def home():
@@ -22,6 +25,14 @@ def show_scans():
     login = current_user.is_authenticated
     if login:
         return render_template('general_scans.html', login=login)
+    else:
+        return error_resp('Must be logged in to see scans')
+
+@index.route('/exploits')
+def show_exploits():
+    login = current_user.is_authenticated
+    if login:
+        return render_template('general_exploits.html', login=login)
     else:
         return error_resp('Must be logged in to see scans')
 
@@ -174,6 +185,7 @@ def show_report(id):
     report_html = Markup(report_html)
     return render_template('report.html', report=report_html, login=login)
 
+
 @index.route("/reports")
 def list_reports():
     """Renders a webpage with a list of reports"""
@@ -188,3 +200,80 @@ def list_reports():
     if len(ret) == 0:
         message = "You have not done any scan"
     return render_template('report_list.html', report_names=ret, message=message, login=login)
+
+@index.route("/shells")
+def list_shells():
+    """Renders a webpage with a list of shells"""
+    login = current_user.is_authenticated
+    if not login:
+        return abort(401)
+    try:
+        msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+        shells = msf_manager.sessions.list
+    except (MsfAuthError, requests.exceptions.ConnectionError):
+        return error_resp("MsfRPC server is offline.")
+    ret = []
+    for shell_id, shell in shells.items():
+        ret.append((shell_id,
+                   shell['target_host'],
+                   shell['session_port'],
+                   shell['type'],
+                   shell['arch'],
+                   shell['desc'],
+                   shell['via_exploit'],
+                   shell['via_payload']))
+    message = ""
+    if len(ret) == 0:
+        message = "You have not done any scan"
+    return render_template('shell_list.html', shell_index=ret, message=message, login=login)
+
+@index.route('/shells/<id>', methods=['GET', 'POST'])
+def shell_interface(id):
+    """Renders a webpage where users can interact with the shell with the specified id."""
+    login = current_user.is_authenticated
+
+    if not login:
+        return error_resp('Must be logged in to see scans')
+
+    try:
+        msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+        shell = msf_manager.sessions.session(id)
+    except (MsfAuthError, requests.exceptions.ConnectionError):
+        return error_resp("MsfRPC server is offline.")
+    if not shell:
+        return abort(404)
+
+    if request.method == 'POST':
+        command = request.form.get('command')
+        shell.write(command)
+        output = shell.read()
+        return render_template('shell_interface.html', command=command, output=output, login=login)
+
+    return render_template('shell_interface.html', login=login)
+
+
+@index.route('/execute_command', methods=['POST'])
+def execute_command():
+    """Executes the command on the shell with the specified id."""
+    command = request.form.get('command')
+    shell_id = request.args.get('shell_id')
+
+    if not (command and shell_id):
+        return jsonify({'error': 'Command and shell ID are required.'}), 400
+
+    try:
+        msf_manager = MsfRpcClient(env.msf_password, ip=env.msf_ip, port=env.msf_port)
+        shell = msf_manager.sessions.session(shell_id)
+    except (MsfAuthError, requests.exceptions.ConnectionError):
+        return jsonify({'error': 'Failed to connect to Metasploit RPC server.'}), 500
+
+    if not shell:
+        return jsonify({'error': 'Shell session with ID {} not found.'.format(shell_id)}), 404
+
+    try:
+        shell.write(command)
+        output = shell.read()
+        return jsonify({'output': output.strip()})
+    except Exception as e:
+        return jsonify({'error': 'An error occurred while executing the command: {}'.format(str(e))}), 500
+

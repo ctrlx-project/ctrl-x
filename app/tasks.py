@@ -1,4 +1,4 @@
-from app import create_app
+from app import create_app, env
 from utils import resolve_ip_block, success_resp
 from celery import shared_task, chain
 import requests
@@ -22,12 +22,12 @@ def test_mq(message):
 
 
 @shared_task(ignore_result=False, name='scan')
-def scan_job(ip: str):
+def scan_job(ip: str, ports: str=''):
     """
     Scans a single IP address
     Returns: scan_id
     """
-    return scanner(ip)
+    return scanner(ip, ports)
 
 
 @shared_task(ignore_result=False, name='parse_scan')
@@ -59,7 +59,7 @@ def report_job(argv):
     return report(exploit_id, scan_id)
 
 
-def dispatch_scan(ip_block: str):
+def dispatch_scan(ip_block: str, ports: str=''):
     """
     Takes in ip in the format a.b.c.d/CIDR, a.b.c.d, or domain name
     Args:
@@ -70,18 +70,19 @@ def dispatch_scan(ip_block: str):
 
     ip_list = resolve_ip_block(ip_block)
     for ip in ip_list:
-        chain(scan_job.s(ip), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
+        chain(scan_job.s(ip, ports), parse_scan_job.s(), exploit_job.s(), report_job.s()).delay()
 
     return success_resp(f'{len(ip_list)} scan job(s) dispatched.')
 
 def report(exploit_id:int, scan_id:int) -> bool:
     exploit = Exploit.query.filter_by(id=exploit_id).first()
     scan = Scan.query.filter_by(id=scan_id).first()
-    newReport = Report(ip=scan.ip, scan_id=scan, status="running")
+    newReport = Report(ip=scan.ip, scan=scan, status="running")
     db.session.add(newReport)
     db.session.commit()
+    header = {'X-api-key': env.api_key}
     payload = {"api_key":env.api_key, "report_id":newReport.id, "exploit_data": dumps(exploit.exploit_data)}
-    r = requests.post("llm-api.onosiris.io/gen_report", data=payload)
+    r = requests.post("https://llm-api.onosiris.io/gen_report", data=payload, headers=header)
     if r.status != 200 or r.json().get("status") != "running":
         newReport.status = "failed"
         return False
