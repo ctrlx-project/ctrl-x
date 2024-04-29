@@ -62,7 +62,7 @@ def scans():
         if request.method == 'GET':
             if ip := request.args.get('ip'):
                 request_ip = str(escape(ip))
-                result = Scan.query.filter(Scan.ip == request_ip)
+                result = Scan.query.filter_by(ip = request_ip)
                 if result:
                     ret = [scan.info for scan in result]
                     p_list = sorted(ret, key=lambda x: x['start_time'])
@@ -88,7 +88,7 @@ def exploits():
         if request.method == 'GET':
             if ip := request.args.get('ip'):
                 request_ip = str(escape(ip))
-                result = Exploit.query.filter(Scan.ip == request_ip)
+                result = Exploit.query.filter_by(ip = request_ip)
                 if result:
                     ret = [exploit.info for exploit in result]
                     p_list = sorted(ret, key=lambda x: x['start_time'])
