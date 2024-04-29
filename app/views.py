@@ -14,7 +14,7 @@ index = Blueprint('index', __name__, static_folder='static', template_folder='te
 
 app = create_app()
 
-@index.route('/', methods=['GET','POST'])
+@index.route('/', methods=['GET'])
 def home():
     if request.method == 'GET':
         return render_template('home.html')
